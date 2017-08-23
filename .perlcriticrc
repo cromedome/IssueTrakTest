@@ -1,0 +1,23 @@
+severity = 4
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Test::Most strictures Moose
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Test::Most strictures Moose
+
+# setting these punctuation vars is useful and shouldn't be punished
+[Variables::RequireLocalizedPunctuationVars]
+allow = %ENV $ENV
+
+[InputOutput::RequireBriefOpen]
+lines = 20
+
+[Modules::RequireExplicitPackage]
+allow_import_of = utf8
+
+# I do not agree with these at all, so never load them
+[-Subroutines::RequireFinalReturn]
+[-Subroutines::ProhibitBuiltinHomonyms]
+# perlcritic thinks signatures are prototypes
+[-Subroutines::ProhibitSubroutinePrototypes] 
