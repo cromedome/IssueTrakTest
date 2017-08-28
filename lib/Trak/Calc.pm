@@ -8,8 +8,8 @@ use namespace::autoclean; # Clean up imported symbols after compilation
 
 sub calculate {
     my ( $self, $formula ) = @_;
-    die "Trak::Calc::calculate(): No formula provided!" unless $formula;
-    return "Trak::Calc::calculate(): formula is '$formula'";
+    die "No formula provided!\n" unless $formula;
+    return "Formula is '$formula'";
 }
 
 # TODO: _parse()
