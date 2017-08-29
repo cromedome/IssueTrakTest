@@ -21,6 +21,7 @@ has debug => (
 # Operators evaluate left to right usually (think addition and subtraction),
 # but in some cases (exponentiation), they implement right to left.
 #
+# TODO: add desc for help
 my %ops = ( 
     '+'  => { order => 10, dir => 'L', exec => sub { $_[0] +  $_[1] }},
     '-'  => { order => 10, dir => 'L', exec => sub { $_[0] -  $_[1] }},
@@ -31,6 +32,7 @@ my %ops = (
 );
 
 # TODO: Sin, cos, tan, max, min, others?
+# TODO: add desc for help
 my %functions = (
     sqrt => sub { return sqrt shift; },
 );
@@ -45,25 +47,20 @@ sub calculate ( $self, $formula ) {
     my @stack;
 
     while( length $work_formula ) {
-        # Pluck a token (pass reference to formula), return value and type
         my( $token, $type ) = $self->_pluck_token( \$work_formula );
         $self->_trace( "Iteration $iteration: Token: $token, Type: $type" );
         $self->_trace( "Iteration $iteration: Remaining formula is '$work_formula'" );
 
         # Find position of token (where will need this)
 
-        # Do stuff with it.
+        # If it's a number, just dump it on the stack and continue.
         if( $type eq "NUM" ) {
             push @stack, $token;
         }
         elsif( $type eq "OP" ) {
-            # TODO: right-associative
-
             # See if this operator has a higher precedence than the one at the top of the
             # stack. If not, pop the one off the top of the stack, pop two numbers off the 
             # number stack, evaluate the result, and push the result back on the number stack.
-            #
-            # Only for left operators though. Right is a special case.
             if( scalar @stack < 2 or $ops{ $token }{ order } >= $ops{ $stack[$#stack - 1] }{ order }) { 
                 push @stack, $token;
             }
@@ -100,11 +97,17 @@ sub calculate ( $self, $formula ) {
     return $value;
 }
 
+#
 # Determine what a token is. Currently can be one of the following:
 # - Positive or negative number
 # - Operator (from the approved list)
 # - Function (from the approved list)
 # - Another expression (in parenthesis)
+# 
+# $formula is passed by reference, so as we pluck tokens, the formula
+# gets smaller. When we reach the end of the formula, we know it's time
+# to calculate.
+#
 sub _pluck_token( $self, $formula ) {
     # Ignore whitespace
     $$formula =~ s/^\s+//;
@@ -135,7 +138,7 @@ sub _where {
 # This shows us a log/stack trace of where we are in parsing the formula provided - but
 # ONLY if we were invoked with the debugging option!
 sub _trace( $self, $message = "") {
-    return unless $self->debug;
+    #return unless $self->debug;
 
     my( $package, $file, $line ) = caller;
     say STDERR sprintf "Line %d: \"%s\"", $line, $message;
