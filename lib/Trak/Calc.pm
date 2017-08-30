@@ -18,19 +18,42 @@ has debug => (
     isa => 'Bool',
 );
 
+has _opstack => (
+    is  => 'rw',
+    isa => 'ArrayRef',
+);
+
+has _numstack => (
+    is  => 'rw',
+    isa => 'ArrayRef[ Int ]',
+);
+
+has _tokens => (
+    is  => 'rw',
+    isa => 'ArrayRef',
+    default => sub { [] },
+);
+
+has _iteration => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0,
+);
+
 #
-# Supported operators, their precedence (order), description (help), and 
-# implementation.
+# Supported operators, their precedence (order), association (dir - L is left-to-right,
+# R is right-to-left), description (help), and implementation.
 #
 # Operators evaluate left to right usually (think addition and subtraction),
 # but in some cases (exponentiation), they implement right to left.
 #
 my %ops = ( 
-    '+'  => { order => 10, exec => sub { $_[0] +  $_[1] }, help => "Addition: +"        },
-    '-'  => { order => 10, exec => sub { $_[0] -  $_[1] }, help => "Subtraction: -"     },
-    '*'  => { order => 20, exec => sub { $_[0] *  $_[1] }, help => "Multiplication: *"  },
+    '+'  => { order => 10, dir => 'L', exec => sub { $_[0] +  $_[1] }, help => "Addition: +"        },
+    '-'  => { order => 10, dir => 'L', exec => sub { $_[0] -  $_[1] }, help => "Subtraction: -"     },
+    '*'  => { order => 20, dir => 'L', exec => sub { $_[0] *  $_[1] }, help => "Multiplication: *"  },
     '/'  => { 
         order => 20, 
+        dir   => 'L',
         exec  => sub { 
             die "Calculation error: can't divide by zero!\n" if $_[1] == 0;
             $_[0] /  $_[1];
@@ -39,81 +62,97 @@ my %ops = (
     },
     '%'  => { 
         order => 20, 
+        dir   => 'L',
         exec  => sub { 
             die "Calculation error: can't mod by zero!\n" if $_[1] == 0;
             $_[0] %  $_[1];
         }, 
         help  => "Modulus: %" 
     },
-    '**' => { order => 30, exec => sub { $_[0] ** $_[1] }, help => "Exponentiation: **" },
+    '**' => { order => 30, dir => 'R', exec => sub { $_[0] ** $_[1] }, help => "Exponentiation: **" },
 );
 
 # List of functions supported
 my %functions = (
     sqrt => { help => "Square Root: sqrt( arg )", exec => sub { return sqrt shift; }},
-    sin  => { help => "Sine: sin(x)",             exec => sub{ return sin shift; }}, 
-    cos  => { help => "Cosine: cos(x)",           exec => sub{ return cos shift; }}, 
-    tan  => { help => "Tangent: tan(x)",          exec => sub{ return tan shift; }}, 
+    sin  => { help => "Sine: sin(x)",             exec => sub { return sin shift;  }}, 
+    cos  => { help => "Cosine: cos(x)",           exec => sub { return cos shift;  }}, 
+    tan  => { help => "Tangent: tan(x)",          exec => sub { return tan shift;  }}, 
 );
 
 # Evaluate the function given and return the result.
 sub calculate ( $self, $formula ) {
     die "No formula provided!\n" unless $formula;
 
-    my $iteration = 1;
-    my @stack;
+    $self->_iteration( 1 );
 
+    # TODO: Print column headers, reformat trace as table.
     while( length $formula ) {
         my( $token, $type, $arg ) = $self->_pluck_token( \$formula );
-        $self->_trace( "Iteration $iteration: Token: $token, Type: $type" );
-        $self->_trace( "Iteration $iteration: Remaining formula is '$formula'" );
+        $self->_trace( "Iteration $self->_iteration: Token: $token, Type: $type" );
+        $self->_trace( "Iteration $self->_iteration: Remaining formula is '$formula'" );
 
         # If it's a number, just dump it on the stack and continue.
         if( $type eq "NUM" ) {
-            push @stack, $token;
+            push @{ $self->_tokens }, $token;
         }
         elsif( $type eq "OP" ) {
             # See if this operator has a higher precedence than the one at the top of the
             # stack. If not, pop the one off the top of the stack, pop two numbers off the 
             # number stack, evaluate the result, and push the result back on the number stack.
-            if( scalar @stack < 2 or $ops{ $token }{ order } >= $ops{ $stack[$#stack - 1] }{ order }) { 
-                push @stack, $token;
+            if( scalar @{ $self->_tokens } < 2 or $ops{ $token }{ order } >= $ops{ $self->_tokens->[-2] }{ order }) { 
+                push @{ $self->_tokens }, $token;
             }
             else {
-                my $t2 = pop @stack;
-                my $op = pop @stack;
-                my $t1 = pop @stack;
+                my $t2 = pop @{ $self->_tokens };
+                my $op = pop @{ $self->_tokens };
+                my $t1 = pop @{ $self->_tokens };
                 my $result = $ops{ $op }{ exec }->( $t1, $t2 );
-                $self->_trace( "Iteration $iteration: calculate $t1 $op $t2 = $result" );
-                push @stack, $result;
-                push @stack, $token;
+                $self->_trace( "Iteration $self->_iteration: calculate $t1 $op $t2 = $result" );
+                push @{ $self->_tokens }, $result;
+                push @{ $self->_tokens }, $token;
             }
         }
         elsif( $type eq "FUNC" ) {
             my $result = $functions{ $token }{ exec }->( $arg );
-            $self->_trace( "Iteration $iteration: evaluate $token( $arg ) = $result" );
-            push @stack, $result;
+            $self->_trace( "Iteration $self->_iteration: evaluate $token( $arg ) = $result" );
+            push @{ $self->_tokens }, $result;
         }
         else {
             die "Unknown token: $token\n";
         }
-        $self->_trace( "Iteration $iteration: Current stack: " . join( ',', @stack ));
+        $self->_trace( "Iteration $self->_iteration: Current stack: " . join( ',', @{ $self->_tokens } )); ###
 
-        ++$iteration;
+        $self->_iteration( $self->_iteration + 1);
     }
 
+    my $value = $self->_evaluate( @{ $self->_tokens } );
+    $self->_reset;
+    return $value;
+}
+
+# TODO: this
+sub _evaluate( $self, @tokens ) {
     # All done! Traverse the stacks from the bottom up and calculate the result
     # TODO: precedence bug when high-precedence operator is at end of formula
-    my $value = shift @stack;
-    while( @stack ) {
-        my $op = shift @stack;
-        my $t1 = shift @stack;
+    my $value = shift @tokens;
+    while( @tokens ) {
+        my $op = shift @tokens;
+        my $t1 = shift @tokens;
         my $result = $ops{ $op }{ exec }->( $value, $t1 );
         $self->_trace( "Calculating $value $op $t1 = $result" );
         $value = $result;
     }
 
     return $value;
+}
+
+# Reset counters and stacks
+sub _reset( $self ) {
+    $self->_numstack([]);
+    $self->_opstack([]);
+    $self->_iteration( 0 );
+    $self->_trace( "Stacks cleared" );
 }
 
 #
