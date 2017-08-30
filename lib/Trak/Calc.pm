@@ -167,6 +167,7 @@ sub _pluck_token( $self, $formula ) {
     }
     # TODO: there's a bug here checking for closed parens
     elsif( $$formula =~ /^(\()(.*)$/ ) {
+        die "Parse error: expected ')'\n" unless $2;
         $$formula = $2;
         $$formula =~ /^(.*?)\)(.*)$/;
         die "Parse error: ')' expected\n" unless $1;
