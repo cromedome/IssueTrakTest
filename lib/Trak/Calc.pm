@@ -162,6 +162,26 @@ sub _pluck_token( $self, $formula ) {
         $$formula =~ s/$2//g;
         $self->_trace( "Found argument '$arg'" );
     }
+    #elsif( $$formula =~ /^(\(.*?\))(.*)$/ ) {
+    elsif( $$formula =~ /^(\()(.*)$/ ) {
+        $$formula = $2;
+        $$formula =~ /^(.*?)\)(.*)$/;
+        die "Parse error: ')' expected\n" unless $1;
+
+        # Pass only the parenthetical piece. Make sure we remove it from the original
+        # formula.
+        my $f2 = $1;
+        $$formula =~ s/^(.*?)\)//g;
+        $self->_trace( "Nested formula is $f2, remaining is $$formula" );
+        $token = $self->calculate( $f2 );
+        $type = "NUM";
+    }
+   #if(/\G\(/gc) {  #  '(' expr ')'
+        #my $value = $self->parse_expr();
+        #/\G\s*/gc;
+        #/\G\)/gc or die "Parse error: ')' expected at: " . where() ;
+        #return $value;
+    #}
     else {
         $token = $$formula;
         $type  = "UNKNOWN";
