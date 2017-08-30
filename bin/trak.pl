@@ -16,17 +16,21 @@ use Trak::Calc;
 
 # Parse CLI options
 GetOptions(
-    'debug|d' => \my $debug,
-    'help|h'  => \my $help,
+    'debug|d'       => \my $debug,
+    'help|h'        => \my $help,
+    'formulahelp|f' => \my $fh,
 ) or die pod2usage(2);
 my @formulas = @ARGV;
 
-# Do nothing else if help was asked for
+# Show help and exit if help was requested
 pod2usage(0) if $help;
 
-# Calculate the formulas given, or drop into interactive mode
+# Show help, calculate the formulas given, or drop into interactive mode
 my $calc = Trak::Calc->new( debug => $debug );
-if( scalar @formulas > 0 ) {
+if( $fh ) {
+    say $calc->help;
+}
+elsif( scalar @formulas > 0 ) {
     say "'$_' evaluates to ", $calc->calculate($_) foreach @formulas;
 }
 else {
@@ -45,18 +49,30 @@ Hi there! I'm a simple wrapper around Trak::Calc. My purpose in life
 is to make it easy to enter one or more formulas to evaluate into
 the calculator and evaluate the result. If there's a problem with
 your formula, I will tell you that too. So let's get started!
+
+Commands available to you are help, debug, and exit.
     };
 
+    say "Debugging is set to ", $calc->debug ? "true" : "false", ".\n";
     my $input;
     do {
-        # TODO: toggle debugging
-        # TODO: handle empty input
-        # TODO: help
         $input = $term->get_reply( prompt => "Enter a formula, or 'exit' to finish" );
-        if( $input ne "exit" ) {
-            say "'$input' evaluates to ", $calc->calculate( $input );
+        if( length $input ) {
+            if( $input eq "debug" ) {
+                $calc->debug( !$calc->debug );
+                say "Debugging now set to ", $calc->debug ? "true." : "false.";
+            }
+            elsif( $input eq "help" ) {
+                say $calc->help;
+            }
+            elsif( $input ne "exit" ) {
+                say "'$input' evaluates to ", $calc->calculate( $input );
+            }
         }
-    } while( $input ne "exit" );
+        else {
+            say "No formula entered.";
+        }
+    } while(( $input // '' ) ne "exit" );
 }
 
 __END__

@@ -26,24 +26,24 @@ has debug => (
 #
 # TODO: add desc for help
 my %ops = ( 
-    '+'  => { order => 10, exec => sub { $_[0] +  $_[1] }},
-    '-'  => { order => 10, exec => sub { $_[0] -  $_[1] }},
-    '*'  => { order => 20, exec => sub { $_[0] *  $_[1] }},
+    '+'  => { order => 10, exec => sub { $_[0] +  $_[1] }, help => "Addition: +"        },
+    '-'  => { order => 10, exec => sub { $_[0] -  $_[1] }, help => "Subtraction: -"     },
+    '*'  => { order => 20, exec => sub { $_[0] *  $_[1] }, help => "Multiplication: *"  },
     '/'  => { order => 20, exec => sub { 
             die "Caclulation error: can't divide by zero!\n" if $_[1] == 0;
             $_[0] /  $_[1];
-        }},
+        }, help => "Division: /" },
     '%'  => { order => 20, exec => sub { 
             die "Caclulation error: can't divide by zero!\n" if $_[1] == 0;
             $_[0] %  $_[1];
-        }},
-    '**' => { order => 30, exec => sub { $_[0] ** $_[1] }},
+        }, help => "Modulus: %" },
+    '**' => { order => 30, exec => sub { $_[0] ** $_[1] }, help => "Exponentiation: **" },
 );
 
 # TODO: Sin, cos, tan, others?
 # TODO: add desc for help
 my %functions = (
-    sqrt => sub { return sqrt shift; },
+    sqrt => { help => "Square Root: sqrt( arg )", exec => sub { return sqrt shift; }},
 );
 
 # Evaluate the function given and return the result.
@@ -188,6 +188,16 @@ sub _trace( $self, $message = "") {
 
     my( $package, $file, $line ) = caller;
     say STDERR sprintf "Line %3s: \"%s\"", $line, $message;
+}
+
+# Auto-generate some help information in the shell
+sub help {
+    my $message = "The following operators are available to you in the Trak calculator:\n";
+    $message .= $ops{ $_ }{ help } . "\n" foreach keys %ops;
+    $message .= "\nThe following functions are also available:\n";
+    $message .= $functions{ $_ }{ help } foreach keys %functions;
+
+    return "$message\n";
 }
 
 # Speed up object construction, but make classes immutable
