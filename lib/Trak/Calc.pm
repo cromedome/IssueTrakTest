@@ -104,6 +104,7 @@ sub calculate ( $self, $formula ) {
     }
 
     # All done! Traverse the stacks from the bottom up and calculate the result
+    # TODO: precedence bug when high-precedence operator is at end of formula
     my $value = shift @stack;
     while( @stack ) {
         my $op = shift @stack;
@@ -130,6 +131,7 @@ sub calculate ( $self, $formula ) {
 # There is a bit of redundant code here. This was necessited by a bug I found
 # in Perl's regex parser in the formula tokenizer. More below.
 #
+# TODO: whitepsace handling bug
 sub _pluck_token( $self, $formula ) {
     # Ignore whitespace
     $$formula =~ s/^\s+//;

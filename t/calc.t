@@ -10,20 +10,40 @@ my $calc = Trak::Calc->new;
 # Invalid operators
 # Invalid formulas
 # Invalid functions
-# Simple formula
-# Complex formula/ops
-# Test each op
 # Test parens
 # Garbage at end
 
-# Catch divide by zero
+# Formula complexity
+cmp_ok( $calc->calculate( "1 + 2 + 3 + 4 - 5" ), '==', 5, 
+    "Calculator can evaluate simple formulas" );
+#cmp_ok( $calc->calculate( "(1 + 2 ** 3 ) / 3 - ( 4 - 5)" ), '==', 4, 
+    #"...and complex ones too" );
+
+# Operator tests
+cmp_ok( $calc->calculate( "1 + 2" ), '==', 3, "Calculator does basic addition" );
+cmp_ok( $calc->calculate( "4 - 2" ), '==', 2, "...and subtraction" );
+cmp_ok( $calc->calculate( "3 * 2" ), '==', 6, "...and multiplication" );
+cmp_ok( $calc->calculate( "3 / 3" ), '==', 1, "...and division" );
 throws_ok { $calc->calculate( "5/0" ) } 
      "/divide by zero/",
-    '...and fails gracefully on division by zero';
-
+    "...but doesn't let us divide by zero";
+cmp_ok( $calc->calculate( "7 % 4" ), '==', 3, "...we can do modulus too" );
 throws_ok { $calc->calculate( "5%0" ) } 
      "/mod by zero/",
-    '...and fails gracefully on modulus by zero';
+    "...but again, not by zero";
+cmp_ok( $calc->calculate( "2 ** 3" ), '==', 8, "...and can handle exponentiation" );
+
+ # Functions
+cmp_ok( $calc->calculate( "sqrt(9)" ), '==', 3, "Calculator calculates square root" );
+lives_ok{ $calc->calculate( "sin(90)" )} "...and sine";
+lives_ok{ $calc->calculate( "cos(90)" )} "...and cosine";
+lives_ok{ $calc->calculate( "tan(90)" )} "...and tangent";
+ 
+# Negative numbers
+cmp_ok( $calc->calculate( "1 - -1" ), '==', 2, 
+    "Calculator handles negative numbers properly" );
+#cmp_ok( $calc->calculate( "   8     /4   +   6 / ( 4-    2   )       " ), '==', 5, 
+    #"...and weird combinations of whitespace" );
 
 done_testing;
 
