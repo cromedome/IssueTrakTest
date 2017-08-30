@@ -32,7 +32,7 @@ my %ops = (
     '/'  => { 
         order => 20, 
         exec  => sub { 
-            die "Caclulation error: can't divide by zero!\n" if $_[1] == 0;
+            die "Calculation error: can't divide by zero!\n" if $_[1] == 0;
             $_[0] /  $_[1];
         }, 
         help  => "Division: /" 
@@ -40,7 +40,7 @@ my %ops = (
     '%'  => { 
         order => 20, 
         exec  => sub { 
-            die "Caclulation error: can't divide by zero!\n" if $_[1] == 0;
+            die "Calculation error: can't mod by zero!\n" if $_[1] == 0;
             $_[0] %  $_[1];
         }, 
         help  => "Modulus: %" 
