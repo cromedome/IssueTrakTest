@@ -23,6 +23,7 @@ requires 'perl', '5.24.0';
 requires 'strictures';
 requires 'List::MoreUtils::XS';
 requires 'Term::UI';
+requires 'Scalar::Util::Numeric';
 requires 'Moose';
 requires 'MooseX::MarkAsMethods','0.13';
 requires 'MooseX::NonMoose','0.25';

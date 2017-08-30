@@ -129,9 +129,9 @@ sub _pluck_token( $self, $formula ) {
 
     # Positive or negative number
     my( $token, $type, $arg );
-    if( $$formula =~ /^([+-]?\d+)(.*)$/x ) {
-        #die "Parse error: $1 isn't an integer!\n" unless isint( $1 );
+    if( $$formula =~ /^([+-]?\d+\.?\d*?)(.*)$/x ) {
         $token    = $1;
+        die "Parse error: $1 isn't an integer!\n" unless isint( $token );
         $type     = "NUM";
         $$formula = $2;
     }
@@ -162,7 +162,6 @@ sub _pluck_token( $self, $formula ) {
         $$formula =~ s/$2//g;
         $self->_trace( "Found argument '$arg'" );
     }
-    #elsif( $$formula =~ /^(\(.*?\))(.*)$/ ) {
     elsif( $$formula =~ /^(\()(.*)$/ ) {
         $$formula = $2;
         $$formula =~ /^(.*?)\)(.*)$/;
@@ -176,12 +175,6 @@ sub _pluck_token( $self, $formula ) {
         $token = $self->calculate( $f2 );
         $type = "NUM";
     }
-   #if(/\G\(/gc) {  #  '(' expr ')'
-        #my $value = $self->parse_expr();
-        #/\G\s*/gc;
-        #/\G\)/gc or die "Parse error: ')' expected at: " . where() ;
-        #return $value;
-    #}
     else {
         $token = $$formula;
         $type  = "UNKNOWN";
