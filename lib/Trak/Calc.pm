@@ -60,14 +60,13 @@ my %functions = (
 sub calculate ( $self, $formula ) {
     die "No formula provided!\n" unless $formula;
 
-    my $work_formula = $formula;
     my $iteration = 1;
     my @stack;
 
-    while( length $work_formula ) {
-        my( $token, $type, $arg ) = $self->_pluck_token( \$work_formula );
+    while( length $formula ) {
+        my( $token, $type, $arg ) = $self->_pluck_token( \$formula );
         $self->_trace( "Iteration $iteration: Token: $token, Type: $type" );
-        $self->_trace( "Iteration $iteration: Remaining formula is '$work_formula'" );
+        $self->_trace( "Iteration $iteration: Remaining formula is '$formula'" );
 
         # If it's a number, just dump it on the stack and continue.
         if( $type eq "NUM" ) {
