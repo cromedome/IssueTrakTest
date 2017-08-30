@@ -12,6 +12,7 @@ use Term::UI;
 use Term::ReadLine;
 use Getopt::Long;
 use Pod::Usage;
+use Try::Tiny;
 use Trak::Calc;
 
 # Parse CLI options
@@ -40,7 +41,9 @@ else {
 say "All done! Goodbye.";
 exit 0;
 
-# Give users an interactive session
+##
+## Give users an interactive session
+##
 sub do_interactive( $calc ) {
     my $term = Term::ReadLine->new('Trak');
 
@@ -66,7 +69,12 @@ Commands available to you are help, debug, and exit.
                 say $calc->help;
             }
             elsif( $input ne "exit" ) {
-                say "'$input' evaluates to ", $calc->calculate( $input );
+                try {
+                    say "'$input' evaluates to ", $calc->calculate( $input );
+                }
+                catch {
+                    say $_;
+                };
             }
         }
         else {
