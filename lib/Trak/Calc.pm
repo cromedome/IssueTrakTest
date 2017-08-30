@@ -18,7 +18,7 @@ has debug => (
 );
 
 #
-# Supported operators, their precedence (order), direction (L or R), and 
+# Supported operators, their precedence (order), description (help), and 
 # implementation.
 #
 # Operators evaluate left to right usually (think addition and subtraction),
@@ -26,18 +26,18 @@ has debug => (
 #
 # TODO: add desc for help
 my %ops = ( 
-    '+'  => { order => 10, dir => 'L', exec => sub { $_[0] +  $_[1] }},
-    '-'  => { order => 10, dir => 'L', exec => sub { $_[0] -  $_[1] }},
-    '*'  => { order => 20, dir => 'L', exec => sub { $_[0] *  $_[1] }},
-    '/'  => { order => 20, dir => 'L', exec => sub { 
+    '+'  => { order => 10, exec => sub { $_[0] +  $_[1] }},
+    '-'  => { order => 10, exec => sub { $_[0] -  $_[1] }},
+    '*'  => { order => 20, exec => sub { $_[0] *  $_[1] }},
+    '/'  => { order => 20, exec => sub { 
             die "Caclulation error: can't divide by zero!\n" if $_[1] == 0;
             $_[0] /  $_[1];
         }},
-    '%'  => { order => 20, dir => 'L', exec => sub { 
+    '%'  => { order => 20, exec => sub { 
             die "Caclulation error: can't divide by zero!\n" if $_[1] == 0;
             $_[0] %  $_[1];
         }},
-    '**' => { order => 30, dir => 'R', exec => sub { $_[0] ** $_[1] }},
+    '**' => { order => 30, exec => sub { $_[0] ** $_[1] }},
 );
 
 # TODO: Sin, cos, tan, others?
