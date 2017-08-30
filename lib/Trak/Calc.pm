@@ -18,28 +18,6 @@ has debug => (
     isa => 'Bool',
 );
 
-has _opstack => (
-    is  => 'rw',
-    isa => 'ArrayRef',
-);
-
-has _numstack => (
-    is  => 'rw',
-    isa => 'ArrayRef[ Int ]',
-);
-
-has _tokens => (
-    is  => 'rw',
-    isa => 'ArrayRef',
-    default => sub { [] },
-);
-
-has _iteration => (
-    is      => 'rw',
-    isa     => 'Int',
-    default => 0,
-);
-
 #
 # Supported operators, their precedence (order), association (dir - L is left-to-right,
 # R is right-to-left), description (help), and implementation.
@@ -81,74 +59,91 @@ my %functions = (
 sub calculate ( $self, $formula ) {
     die "No formula provided!\n" unless $formula;
 
-    $self->_iteration( 1 );
-    $self->_trace_header;
+    my( @opstack, @numstack );
+    my $iteration = 1;
 
+    # 
+    # Set up reporting.
+    #
+    # This anonymous subroutine allows us to conveniently, repeatedly call this reporting
+    # method, and gives us access to all local vars in calculate(). Cool!
+    #
+    my $trace = sub ( $action = "", $token = "", $header = 0 ) {
+        # Print trace output header
+        if( $header ) {
+            $self->_log( " #  Token Number Stack          Operator Stack        Action    Remaining" );
+            $self->_log( "--- ----- --------------------- --------------------- --------- ---------------" );
+            return;
+        }
+
+        # Generate a trace message
+        $self->_log( sprintf "%-3d %-5s %-21s %-21s %-9s %-15s",
+            $iteration,
+            $token,
+            join( ',', @numstack ),
+            join( ',', @opstack ),
+            $action,
+            $formula,
+        );
+    };
+
+    $trace->( "", "", 1 ); 
     while( length $formula ) {
         my( $token, $type, $arg ) = $self->_pluck_token( \$formula );
-        $self->_trace( "", $token, $type ); 
-        $self->_trace( "$formula" );
 
         # If it's a number, just dump it on the stack and continue.
         if( $type eq "NUM" ) {
-            push @{ $self->_tokens }, $token;
+            push @numstack, $token;
+            $trace->( "Reduce", $token );
         }
         elsif( $type eq "OP" ) {
             # See if this operator has a higher precedence than the one at the top of the
             # stack. If not, pop the one off the top of the stack, pop two numbers off the 
             # number stack, evaluate the result, and push the result back on the number stack.
-            if( scalar @{ $self->_tokens } < 2 or $ops{ $token }{ order } >= $ops{ $self->_tokens->[-2] }{ order }) { 
-                push @{ $self->_tokens }, $token;
+            if( @opstack == 0 or $ops{ $token }{ order } >= $ops{ $opstack[-1] }{ order }) { 
+                push @opstack, $token;
+                $trace->( "Shift", $token );
             }
             else {
-                my $t2 = pop @{ $self->_tokens };
-                my $op = pop @{ $self->_tokens };
-                my $t1 = pop @{ $self->_tokens };
+                my $t2 = pop @numstack;
+                my $op = pop @opstack;
+                my $t1 = pop @numstack;
                 my $result = $ops{ $op }{ exec }->( $t1, $t2 );
-                $self->_trace( "$t1 $op $t2 = $result" );
-                push @{ $self->_tokens }, $result;
-                push @{ $self->_tokens }, $token;
+                push @numstack, $result;
+                push @opstack, $token;
+                $trace->( "Evaluate", $result );
             }
         }
         elsif( $type eq "FUNC" ) {
             my $result = $functions{ $token }{ exec }->( $arg );
-            $self->_trace( "$token( $arg ) = $result" );
-            push @{ $self->_tokens }, $result;
+            push @numstack, $result;
+            $trace->( "Evaluate", $token );
         }
         else {
             die "Unknown token: $token\n";
         }
 
-        $self->_iteration( $self->_iteration + 1);
+        ++$iteration;
     }
 
-    my $value = $self->_evaluate( @{ $self->_tokens } );
-    $self->_reset;
+    my $value = $self->_evaluate;
     return $value;
 }
 
 # TODO: this
-sub _evaluate( $self, @tokens ) {
+sub _evaluate( $self ) {
     # All done! Traverse the stacks from the bottom up and calculate the result
     # TODO: precedence bug when high-precedence operator is at end of formula
-    my $value = shift @tokens;
-    while( @tokens ) {
-        my $op = shift @tokens;
-        my $t1 = shift @tokens;
-        my $result = $ops{ $op }{ exec }->( $value, $t1 );
-        $self->_trace( "$value $op $t1 = $result" );
-        $value = $result;
-    }
+    #my $value = pop @{ $self->_numstack };;
+    #while( @tokens ) {
+        #my $op = shift @tokens;
+        #my $t1 = shift @tokens;
+        #my $result = $ops{ $op }{ exec }->( $value, $t1 );
+        #$self->_trace( "$value $op $t1 = $result" );
+        #$value = $result;
+    #}
 
-    return $value;
-}
-
-# Reset counters and stacks
-sub _reset( $self ) {
-    $self->_numstack([]);
-    $self->_opstack([]);
-    $self->_iteration( 0 );
-    $self->_trace( "Stacks cleared" );
+    #return $value;
 }
 
 #
@@ -232,28 +227,9 @@ sub _pluck_token( $self, $formula ) {
     return( $token, $type, $arg );
 }
 
-# This shows us a log/stack trace of where we are in parsing the formula provided - but
-# ONLY if we were invoked with the debugging option!
-sub _trace( $self, $message = "", $token = "", $type = "" ) {
+sub _log( $self, $message ) {
     return unless $self->debug;
-
-    my( $package, $file, $line ) = caller;
-    say STDERR sprintf "%3d %-5s %-43s %-19s %4d", 
-    #say STDERR sprintf "%3d %-5s %-21s %-21s %-19s %4d", 
-        $self->_iteration,
-        $token,
-        #join( ',', @{ $self->_numstack} ),
-        #join( ',', @{ $self->_opstack } ),
-        join( ',', @{ $self->_tokens } ),
-        $message,
-        $line;
-}
-
-# Print trace output header
-sub _trace_header( $self ) {
-    return unless $self->debug;
-    say STDERR " #  Token Number Stack          Operator Stack        Message             Line";
-    say STDERR "--- ----- --------------------- --------------------- ------------------- ----";
+    say STDERR $message;
 }
 
 # Auto-generate some help information in the shell
