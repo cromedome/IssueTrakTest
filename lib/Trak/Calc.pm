@@ -153,7 +153,7 @@ sub _pluck_token( $self, $formula ) {
         $token    = $1;
         $type     = "FUNC";
         $$formula = $2;
-        $functions{ $token } or die "Undefined function: '$token'\n";
+        $functions{ $token } or die "Unknown function: '$token'\n";
         $self->_trace( "Found function $token" );
 
         # Get the argument. The second regex *should* have done this, but there
