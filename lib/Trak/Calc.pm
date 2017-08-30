@@ -24,24 +24,30 @@ has debug => (
 # Operators evaluate left to right usually (think addition and subtraction),
 # but in some cases (exponentiation), they implement right to left.
 #
-# TODO: add desc for help
 my %ops = ( 
     '+'  => { order => 10, exec => sub { $_[0] +  $_[1] }, help => "Addition: +"        },
     '-'  => { order => 10, exec => sub { $_[0] -  $_[1] }, help => "Subtraction: -"     },
     '*'  => { order => 20, exec => sub { $_[0] *  $_[1] }, help => "Multiplication: *"  },
-    '/'  => { order => 20, exec => sub { 
+    '/'  => { 
+        order => 20, 
+        exec  => sub { 
             die "Caclulation error: can't divide by zero!\n" if $_[1] == 0;
             $_[0] /  $_[1];
-        }, help => "Division: /" },
-    '%'  => { order => 20, exec => sub { 
+        }, 
+        help  => "Division: /" 
+    },
+    '%'  => { 
+        order => 20, 
+        exec  => sub { 
             die "Caclulation error: can't divide by zero!\n" if $_[1] == 0;
             $_[0] %  $_[1];
-        }, help => "Modulus: %" },
+        }, 
+        help  => "Modulus: %" 
+    },
     '**' => { order => 30, exec => sub { $_[0] ** $_[1] }, help => "Exponentiation: **" },
 );
 
 # TODO: Sin, cos, tan, others?
-# TODO: add desc for help
 my %functions = (
     sqrt => { help => "Square Root: sqrt( arg )", exec => sub { return sqrt shift; }},
 );
@@ -159,6 +165,7 @@ sub _pluck_token( $self, $formula ) {
         $$formula =~ s/$2//g;
         $self->_trace( "Found argument '$arg'" );
     }
+    # TODO: there's a bug here checking for closed parens
     elsif( $$formula =~ /^(\()(.*)$/ ) {
         $$formula = $2;
         $$formula =~ /^(.*?)\)(.*)$/;
