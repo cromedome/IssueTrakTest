@@ -25,9 +25,9 @@ my @formulas = @ARGV;
 pod2usage(0) if $help;
 
 # Calculate the formulas given, or drop into interactive mode
-my $calc = Trak::Calc->new;
+my $calc = Trak::Calc->new( debug => $debug );
 if( scalar @formulas > 0 ) {
-    say $calc->calculate($_) foreach @formulas;
+    say "'$_' evaluates to ", $calc->calculate($_) foreach @formulas;
 }
 else {
     do_interactive( $calc );
@@ -49,9 +49,12 @@ your formula, I will tell you that too. So let's get started!
 
     my $input;
     do {
+        # TODO: toggle debugging
+        # TODO: handle empty input
+        # TODO: help
         $input = $term->get_reply( prompt => "Enter a formula, or 'exit' to finish" );
         if( $input ne "exit" ) {
-            say $calc->calculate( $input );
+            say "Evaluates to: ", $calc->calculate( $input );
         }
     } while( $input ne "exit" );
 }
