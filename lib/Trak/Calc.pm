@@ -10,6 +10,7 @@ use namespace::autoclean; # Clean up imported symbols after compilation
 
 # Everything else
 use Scalar::Util::Numeric qw( isint );
+use Math::Trig;
 
 # Are we debugging? Create get/set methods and let us change this at runtime.
 has debug => (
@@ -50,6 +51,9 @@ my %ops = (
 # TODO: Sin, cos, tan, others?
 my %functions = (
     sqrt => { help => "Square Root: sqrt( arg )", exec => sub { return sqrt shift; }},
+    sin  => { help => "Sine: sin(x)",             exec => sub{ return sin shift; }}, 
+    cos  => { help => "Cosine: cos(x)",           exec => sub{ return cos shift; }}, 
+    tan  => { help => "Tangent: tan(x)",          exec => sub{ return tan shift; }}, 
 );
 
 # Evaluate the function given and return the result.
@@ -87,7 +91,7 @@ sub calculate ( $self, $formula ) {
             }
         }
         elsif( $type eq "FUNC" ) {
-            my $result = $functions{ $token }->( $arg );
+            my $result = $functions{ $token }{ exec }->( $arg );
             $self->_trace( "Iteration $iteration: evaluate $token( $arg ) = $result" );
             push @stack, $result;
         }
@@ -165,7 +169,6 @@ sub _pluck_token( $self, $formula ) {
         $$formula =~ s/$2//g;
         $self->_trace( "Found argument '$arg'" );
     }
-    # TODO: there's a bug here checking for closed parens
     elsif( $$formula =~ /^(\()(.*)$/ ) {
         die "Parse error: expected ')'\n" unless $2;
         $$formula = $2;
