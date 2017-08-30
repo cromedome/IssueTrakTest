@@ -54,7 +54,7 @@ your formula, I will tell you that too. So let's get started!
         # TODO: help
         $input = $term->get_reply( prompt => "Enter a formula, or 'exit' to finish" );
         if( $input ne "exit" ) {
-            say "Evaluates to: ", $calc->calculate( $input );
+            say "'$input' evaluates to ", $calc->calculate( $input );
         }
     } while( $input ne "exit" );
 }
