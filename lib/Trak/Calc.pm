@@ -52,15 +52,12 @@ sub calculate ( $self, $formula ) {
 
     my $work_formula = $formula;
     my $iteration = 1;
-    my( @opstack, @numstack );
     my @stack;
 
     while( length $work_formula ) {
         my( $token, $type, $arg ) = $self->_pluck_token( \$work_formula );
         $self->_trace( "Iteration $iteration: Token: $token, Type: $type" );
         $self->_trace( "Iteration $iteration: Remaining formula is '$work_formula'" );
-
-        # Find position of token (where will need this)
 
         # If it's a number, just dump it on the stack and continue.
         if( $type eq "NUM" ) {
@@ -182,15 +179,6 @@ sub _pluck_token( $self, $formula ) {
 
     $arg //= ""; # Make sure arg is at least empty string
     return( $token, $type, $arg );
-}
-
-# This shows us where we are in parsing the formula by superimposing an inverted
-# ? character on top of our position in the formula.
-sub _where { 
-    # pass original formula, token, find location, return modified formula
-    #my $s = $_;
-    #substr($s, pos || 0, 0) = "\267";
-    #return $s;
 }
 
 # This shows us a log/stack trace of where we are in parsing the formula provided - but
