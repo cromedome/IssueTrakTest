@@ -48,7 +48,7 @@ my %ops = (
     '**' => { order => 30, exec => sub { $_[0] ** $_[1] }, help => "Exponentiation: **" },
 );
 
-# TODO: Sin, cos, tan, others?
+# List of functions supported
 my %functions = (
     sqrt => { help => "Square Root: sqrt( arg )", exec => sub { return sqrt shift; }},
     sin  => { help => "Sine: sin(x)",             exec => sub{ return sin shift; }}, 

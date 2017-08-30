@@ -45,5 +45,6 @@ cmp_ok( $calc->calculate( "1 - -1" ), '==', 2,
 #cmp_ok( $calc->calculate( "   8     /4   +   6 / ( 4-    2   )       " ), '==', 5, 
     #"...and weird combinations of whitespace" );
 
+# Throw my other examples in here too...
 done_testing;
 
