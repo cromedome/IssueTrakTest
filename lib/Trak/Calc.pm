@@ -44,9 +44,6 @@ has _iteration => (
 # Supported operators, their precedence (order), association (dir - L is left-to-right,
 # R is right-to-left), description (help), and implementation.
 #
-# Operators evaluate left to right usually (think addition and subtraction),
-# but in some cases (exponentiation), they implement right to left.
-#
 my %ops = ( 
     '+'  => { order => 10, dir => 'L', exec => sub { $_[0] +  $_[1] }, help => "Addition: +"        },
     '-'  => { order => 10, dir => 'L', exec => sub { $_[0] -  $_[1] }, help => "Subtraction: -"     },
@@ -85,12 +82,12 @@ sub calculate ( $self, $formula ) {
     die "No formula provided!\n" unless $formula;
 
     $self->_iteration( 1 );
+    $self->_trace_header;
 
-    # TODO: Print column headers, reformat trace as table.
     while( length $formula ) {
         my( $token, $type, $arg ) = $self->_pluck_token( \$formula );
-        $self->_trace( "Iteration $self->_iteration: Token: $token, Type: $type" );
-        $self->_trace( "Iteration $self->_iteration: Remaining formula is '$formula'" );
+        $self->_trace( "", $token, $type ); 
+        $self->_trace( "$formula" );
 
         # If it's a number, just dump it on the stack and continue.
         if( $type eq "NUM" ) {
@@ -108,20 +105,19 @@ sub calculate ( $self, $formula ) {
                 my $op = pop @{ $self->_tokens };
                 my $t1 = pop @{ $self->_tokens };
                 my $result = $ops{ $op }{ exec }->( $t1, $t2 );
-                $self->_trace( "Iteration $self->_iteration: calculate $t1 $op $t2 = $result" );
+                $self->_trace( "$t1 $op $t2 = $result" );
                 push @{ $self->_tokens }, $result;
                 push @{ $self->_tokens }, $token;
             }
         }
         elsif( $type eq "FUNC" ) {
             my $result = $functions{ $token }{ exec }->( $arg );
-            $self->_trace( "Iteration $self->_iteration: evaluate $token( $arg ) = $result" );
+            $self->_trace( "$token( $arg ) = $result" );
             push @{ $self->_tokens }, $result;
         }
         else {
             die "Unknown token: $token\n";
         }
-        $self->_trace( "Iteration $self->_iteration: Current stack: " . join( ',', @{ $self->_tokens } )); ###
 
         $self->_iteration( $self->_iteration + 1);
     }
@@ -140,7 +136,7 @@ sub _evaluate( $self, @tokens ) {
         my $op = shift @tokens;
         my $t1 = shift @tokens;
         my $result = $ops{ $op }{ exec }->( $value, $t1 );
-        $self->_trace( "Calculating $value $op $t1 = $result" );
+        $self->_trace( "$value $op $t1 = $result" );
         $value = $result;
     }
 
@@ -194,7 +190,7 @@ sub _pluck_token( $self, $formula ) {
         $type     = "FUNC";
         $$formula = $2;
         $functions{ $token } or die "Unknown function: '$token'\n";
-        $self->_trace( "Found function $token" );
+        #$self->_trace( "Found function $token" );
 
         # Get the argument. The second regex *should* have done this, but there
         # is a bug in the Perl regex engine that is causing the second capture to 
@@ -207,7 +203,7 @@ sub _pluck_token( $self, $formula ) {
         die "Parse error: ')' expected\n" unless $1;
         $arg = $1;
         $$formula =~ s/$2//g;
-        $self->_trace( "Found argument '$arg'" );
+        #$self->_trace( "Found argument '$arg'" );
     }
     elsif( $$formula =~ /^(\()(.*)$/ ) {
         # Handle parenthetical expressions.
@@ -223,7 +219,7 @@ sub _pluck_token( $self, $formula ) {
         # formula.
         my $f2 = $1;
         $$formula =~ s/^(.*?)\)//g;
-        $self->_trace( "Nested formula is $f2, remaining is $$formula" );
+        #$self->_trace( "Nested formula is $f2, remaining is $$formula" );
         $token = $self->calculate( $f2 );
         $type = "NUM";
     }
@@ -238,11 +234,26 @@ sub _pluck_token( $self, $formula ) {
 
 # This shows us a log/stack trace of where we are in parsing the formula provided - but
 # ONLY if we were invoked with the debugging option!
-sub _trace( $self, $message = "") {
+sub _trace( $self, $message = "", $token = "", $type = "" ) {
     return unless $self->debug;
 
     my( $package, $file, $line ) = caller;
-    say STDERR sprintf "Line %3s: \"%s\"", $line, $message;
+    say STDERR sprintf "%3d %-5s %-43s %-19s %4d", 
+    #say STDERR sprintf "%3d %-5s %-21s %-21s %-19s %4d", 
+        $self->_iteration,
+        $token,
+        #join( ',', @{ $self->_numstack} ),
+        #join( ',', @{ $self->_opstack } ),
+        join( ',', @{ $self->_tokens } ),
+        $message,
+        $line;
+}
+
+# Print trace output header
+sub _trace_header( $self ) {
+    return unless $self->debug;
+    say STDERR " #  Token Number Stack          Operator Stack        Message             Line";
+    say STDERR "--- ----- --------------------- --------------------- ------------------- ----";
 }
 
 # Auto-generate some help information in the shell
