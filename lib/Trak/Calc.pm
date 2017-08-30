@@ -204,9 +204,9 @@ sub _trace( $self, $message = "") {
 # Auto-generate some help information in the shell
 sub help {
     my $message = "The following operators are available to you in the Trak calculator:\n";
-    $message .= $ops{ $_ }{ help } . "\n" foreach keys %ops;
+    $message .= '- ' . $ops{ $_ }{ help } . "\n" foreach keys %ops;
     $message .= "\nThe following functions are also available:\n";
-    $message .= $functions{ $_ }{ help } foreach keys %functions;
+    $message .= '- ' . $functions{ $_ }{ help } . "\n" foreach keys %functions;
 
     return "$message\n";
 }
