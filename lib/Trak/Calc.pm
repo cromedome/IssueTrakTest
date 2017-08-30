@@ -8,6 +8,9 @@ use feature qw(signatures);
 no warnings qw(experimental::signatures);
 use namespace::autoclean; # Clean up imported symbols after compilation
 
+# Everything else
+use Scalar::Util::Numeric qw( isint );
+
 # Are we debugging? Create get/set methods and let us change this at runtime.
 has debug => (
     is  => 'rw',
@@ -26,12 +29,18 @@ my %ops = (
     '+'  => { order => 10, dir => 'L', exec => sub { $_[0] +  $_[1] }},
     '-'  => { order => 10, dir => 'L', exec => sub { $_[0] -  $_[1] }},
     '*'  => { order => 20, dir => 'L', exec => sub { $_[0] *  $_[1] }},
-    '/'  => { order => 20, dir => 'L', exec => sub { $_[0] /  $_[1] }},
-    '%'  => { order => 20, dir => 'L', exec => sub { $_[0] %  $_[1] }},
+    '/'  => { order => 20, dir => 'L', exec => sub { 
+            die "Caclulation error: can't divide by zero!\n" if $_[1] == 0;
+            $_[0] /  $_[1];
+        }},
+    '%'  => { order => 20, dir => 'L', exec => sub { 
+            die "Caclulation error: can't divide by zero!\n" if $_[1] == 0;
+            $_[0] %  $_[1];
+        }},
     '**' => { order => 30, dir => 'R', exec => sub { $_[0] ** $_[1] }},
 );
 
-# TODO: Sin, cos, tan, max, min, others?
+# TODO: Sin, cos, tan, others?
 # TODO: add desc for help
 my %functions = (
     sqrt => sub { return sqrt shift; },
@@ -47,7 +56,7 @@ sub calculate ( $self, $formula ) {
     my @stack;
 
     while( length $work_formula ) {
-        my( $token, $type ) = $self->_pluck_token( \$work_formula );
+        my( $token, $type, $arg ) = $self->_pluck_token( \$work_formula );
         $self->_trace( "Iteration $iteration: Token: $token, Type: $type" );
         $self->_trace( "Iteration $iteration: Remaining formula is '$work_formula'" );
 
@@ -75,6 +84,9 @@ sub calculate ( $self, $formula ) {
             }
         }
         elsif( $type eq "FUNC" ) {
+            my $result = $functions{ $token }->( $arg );
+            $self->_trace( "Iteration $iteration: evaluate $token( $arg ) = $result" );
+            push @stack, $result;
         }
         else {
             die "Unknown token: $token\n";
@@ -108,22 +120,55 @@ sub calculate ( $self, $formula ) {
 # gets smaller. When we reach the end of the formula, we know it's time
 # to calculate.
 #
+# There is a bit of redundant code here. This was necessited by a bug I found
+# in Perl's regex parser in the formula tokenizer. More below.
+#
 sub _pluck_token( $self, $formula ) {
     # Ignore whitespace
     $$formula =~ s/^\s+//;
 
     # Positive or negative number
-    my $type;
+    my( $token, $type, $arg );
     if( $$formula =~ /^([+-]?\d+)(.*)$/x ) {
-        $type = "NUM";
+        #die "Parse error: $1 isn't an integer!\n" unless isint( $1 );
+        $token    = $1;
+        $type     = "NUM";
+        $$formula = $2;
     }
     # Operator
     elsif( $$formula =~ /^(\*\*|[+\-*\/%\\])(.*)$/ ) { 
-        $type = "OP";
+        $token    = $1;
+        $type     = "OP";
+        $$formula = $2;
     }
-    
-    $$formula = $2;
-    return( $1, $type );
+    # Function
+    elsif( $$formula =~ /^([a-z]\w+)\s*?\((.*)$/ ) {  
+        $token    = $1;
+        $type     = "FUNC";
+        $$formula = $2;
+        $functions{ $token } or die "Undefined function: '$token'\n";
+        $self->_trace( "Found function $token" );
+
+        # Get the argument. The second regex *should* have done this, but there
+        # is a bug in the Perl regex engine that is causing the second capture to 
+        # be extra greedy. I checked this regex against a few different data strings
+        # at regex101.com and in Oyster and the regex works as intended... I was able
+        # to work around this with a simple search-and-replace, but in doing so, I
+        # had to make a little redundant code in the operator and number blocks. :(
+        $$formula =~ s/^\s+//;
+        $$formula =~ /^([+-]?\d+)\s*?\)([^\)]*)$/;
+        die "Parse error: ')' expected\n" unless $1;
+        $arg = $1;
+        $$formula =~ s/$2//g;
+        $self->_trace( "Found argument '$arg'" );
+    }
+    else {
+        $token = $$formula;
+        $type  = "UNKNOWN";
+    }
+
+    $arg //= ""; # Make sure arg is at least empty string
+    return( $token, $type, $arg );
 }
 
 # This shows us where we are in parsing the formula by superimposing an inverted
@@ -138,10 +183,10 @@ sub _where {
 # This shows us a log/stack trace of where we are in parsing the formula provided - but
 # ONLY if we were invoked with the debugging option!
 sub _trace( $self, $message = "") {
-    #return unless $self->debug;
+    return unless $self->debug;
 
     my( $package, $file, $line ) = caller;
-    say STDERR sprintf "Line %d: \"%s\"", $line, $message;
+    say STDERR sprintf "Line %3s: \"%s\"", $line, $message;
 }
 
 # Speed up object construction, but make classes immutable
@@ -163,4 +208,10 @@ outlines the algorithm.
 
 Since Perl allows me to look back on the stack, I can implement this with a 
 single stack rather than multiple stacks.
+
+Assumes that function arguments are simple numbers. Could have expanded this
+without a lot of additional work. Could have added functions with multiple 
+arguments with not a lot of additional work.
+
+Assumed you wanted integers, and that is what the tokenizer checks for.
 
