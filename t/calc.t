@@ -28,6 +28,7 @@ throws_ok { $calc->calculate( "5%0" ) }
      "/mod by zero/",
     "...but again, not by zero";
 cmp_ok( $calc->calculate( "2 ^ 3" ), '==', 8, "...and can handle exponentiation" );
+cmp_ok( $calc->calculate( "3 ^ 2 ^ 2" ), '==', 81, "...even several strung together" );
 
 # Implicit multiplication
 cmp_ok( $calc->calculate( "5(4+1)" ), '==', 25, '...as well as implicit multiplication' );
