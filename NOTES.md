@@ -42,7 +42,7 @@ I included a basic test suite that makes sure all code compiles cleanly
 This was lovingly crafted with Perl. More specifically, all of the following 
 were used throughout the development of this:
 
-- Perl 5.22.0
+- Perl 5.24.2
 - Vim
 - Git
 - MacOS Sierra
