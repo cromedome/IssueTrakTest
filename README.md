@@ -18,11 +18,23 @@ to run this calculator.
 
 Download and install Perl from [ActiveState](https://www.activestate.com/activeperl/downloads)
 
+Next, you must clone this Git repo to your machine.
+
 Once installed, you can download a prepackaged Zip archive containing all
 the modules for ActivePerl from [me](https://crome-plated.com/issuetrak/perl.zip).
 This zip can be extracted over your ActiveState Perl install.
 
-Finally, you must clone this Git repo to your machine.
+If you'd rather skip the downloading of the zip and install the modules I use
+for yourself:
+
+```
+c:\projectdir> modules.bat
+```
+
+If you are on Linux or MacOS, run this instead:
+```
+~/projectdir> cpanm --installdeps . --with-develop --with-all-features
+```
 
 ## Running the Application
 
