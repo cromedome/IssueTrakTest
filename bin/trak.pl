@@ -91,7 +91,10 @@ bin/trak.pl - Run the IssueTrak formula parser
 
 =head1 SYNOPSIS
 
-    ./bin/trak.pl [--debug] [--help] [formula]
+    ./bin/trak.pl [--debug] [--help] [--formulahelp] [formula1] [formula2]
+
+    # If you like shorter arguments...
+    ./bin/trak.pl [-d] [-h] [-f] [formula1] [formula2]
 
 =head1 OPTIONS
 
@@ -102,11 +105,16 @@ bin/trak.pl - Run the IssueTrak formula parser
 Turn on debugging. This adds a lot of information to the display when the 
 forumla parser is running.
 
+=item formulahelp
+
+Get help from the calculator itself. This shows a list of available operators
+and functions.
+
 =item help
 
-Show the help information.
+Show this help information.
 
-=item formula
+=item formula[1, 2, ...]
 
 One or more formulas, wrapped in quotations. One formula per quotation.
 
@@ -118,8 +126,32 @@ This program tries to parse any formulas passed through the command line
 directly. If no formulas were given, launch an interactive shell that lets
 the user enter a formula and execute it immediately.
 
-The calculator is implemented by L< Trak::Calc >. See the documentation there
+The calculator is implemented by L<Trak::Calc>. See the documentation there
 for specifics on how it is implemented.
+
+=head1 USING THE SHELL
+
+When started with no formula arguments, F<trak.pl> starts an interactive 
+shell. From this shell, you can enter a single formula from the prompt, and 
+the calculator will evaluate it and give you back an answer.
+
+The shell has several additional commands available:
+
+=over 4
+
+=item debug
+
+Toggle debugging mode. When in debugging mode, you will get trace output 
+showing how the calculator arrived at a result.
+
+=item exit
+
+Exit the interactive shell.
+
+=item help
+
+Get a list of available operators and functions from the calculator. Equivalent
+to the C<--formulahelp> command line argument.
 
 =head1 AUTHOR
 
