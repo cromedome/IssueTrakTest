@@ -16,8 +16,8 @@ my $calc = Trak::Calc->new;
 # Formula complexity
 cmp_ok( $calc->calculate( "1 + 2 + 3 + 4 - 5" ), '==', 5, 
     "Calculator can evaluate simple formulas" );
-#cmp_ok( $calc->calculate( "(1 + 2 ** 3 ) / 3 - ( 4 - 5)" ), '==', 4, 
-    #"...and complex ones too" );
+cmp_ok( $calc->calculate( "(1 + 2 ** 3 ) / 3 - ( 4 - 5)" ), '==', 4, 
+    "...and complex ones too" );
 
 # Operator tests
 cmp_ok( $calc->calculate( "1 + 2" ), '==', 3, "Calculator does basic addition" );
@@ -42,8 +42,8 @@ lives_ok{ $calc->calculate( "tan(90)" )} "...and tangent";
 # Negative numbers
 cmp_ok( $calc->calculate( "1 - -1" ), '==', 2, 
     "Calculator handles negative numbers properly" );
-#cmp_ok( $calc->calculate( "   8     /4   +   6 / ( 4-    2   )       " ), '==', 5, 
-    #"...and weird combinations of whitespace" );
+cmp_ok( $calc->calculate( "   8     /4   +   6 / ( 4-    2   )       " ), '==', 5, 
+    "...and weird combinations of whitespace" );
 
 # Throw my other examples in here too...
 done_testing;
