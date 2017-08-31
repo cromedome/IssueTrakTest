@@ -116,9 +116,10 @@ sub _evaluate ( $self, $formula ) {
                     my( $t1, $t2 ) = splice @numstack, -2, 2; # Dumb array hack
                     my $result = $ops{ $op }{ exec }->( $t1, $t2 );
                     push @numstack, $result;
-                    $trace->( "Evaluate", $result );
+                    $trace->( "Evaluate", $token );
+                    ++$iteration; # This bumps the counter too...
                 }
-                $trace->( "Reduce", $token );
+                $trace->( "Shift", $token );
                 push @opstack, $token;
             }
         }
@@ -213,7 +214,7 @@ sub _pluck_token( $self, $formula ) {
         my $f2 = $1; $f2 =~ s/^\s+//; $f2 =~ s/\s+$//;
         $token = $self->_evaluate( $f2 );
         $type = "NUM";
-        $$formula =~ s/^.*?\)//g;
+        $$formula =~ s/^.*?\)\s*//g;
     }
     else {
         $token = $$formula;
