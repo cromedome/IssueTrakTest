@@ -18,19 +18,21 @@ has debug => (
     isa => 'Bool',
 );
 
+# By making this state, it retains its value through multiple calls of calculate().
+# Only gets reset by evaluate().
+state $iteration = 0;
+
 #
-# Supported operators, their precedence (order), description (help), and 
-# implementation.
-#
-# Operators evaluate left to right usually (think addition and subtraction),
-# but in some cases (exponentiation), they implement right to left.
+# Supported operators, their precedence (order), association (dir - L is left-to-right,
+# R is right-to-left), description (help), and implementation.
 #
 my %ops = ( 
-    '+'  => { order => 10, exec => sub { $_[0] +  $_[1] }, help => "Addition: +"        },
-    '-'  => { order => 10, exec => sub { $_[0] -  $_[1] }, help => "Subtraction: -"     },
-    '*'  => { order => 20, exec => sub { $_[0] *  $_[1] }, help => "Multiplication: *"  },
+    '+'  => { order => 10, dir => 'L', exec => sub { $_[0] +  $_[1] }, help => "Addition: +"        },
+    '-'  => { order => 10, dir => 'L', exec => sub { $_[0] -  $_[1] }, help => "Subtraction: -"     },
+    '*'  => { order => 20, dir => 'L', exec => sub { $_[0] *  $_[1] }, help => "Multiplication: *"  },
     '/'  => { 
         order => 20, 
+        dir   => 'L',
         exec  => sub { 
             die "Calculation error: can't divide by zero!\n" if $_[1] == 0;
             $_[0] /  $_[1];
@@ -39,77 +41,108 @@ my %ops = (
     },
     '%'  => { 
         order => 20, 
+        dir   => 'L',
         exec  => sub { 
             die "Calculation error: can't mod by zero!\n" if $_[1] == 0;
             $_[0] %  $_[1];
         }, 
         help  => "Modulus: %" 
     },
-    '**' => { order => 30, exec => sub { $_[0] ** $_[1] }, help => "Exponentiation: **" },
+    '**' => { order => 30, dir => 'R', exec => sub { $_[0] ** $_[1] }, help => "Exponentiation: **" },
 );
 
 # List of functions supported
 my %functions = (
     sqrt => { help => "Square Root: sqrt( arg )", exec => sub { return sqrt shift; }},
-    sin  => { help => "Sine: sin(x)",             exec => sub{ return sin shift; }}, 
-    cos  => { help => "Cosine: cos(x)",           exec => sub{ return cos shift; }}, 
-    tan  => { help => "Tangent: tan(x)",          exec => sub{ return tan shift; }}, 
+    sin  => { help => "Sine: sin(x)",             exec => sub { return sin shift;  }}, 
+    cos  => { help => "Cosine: cos(x)",           exec => sub { return cos shift;  }}, 
+    tan  => { help => "Tangent: tan(x)",          exec => sub { return tan shift;  }}, 
 );
 
-# Evaluate the function given and return the result.
+# Calculate is a front-end for evaluate. It throws up a report header, runs the calculation,
+# and resets the interation counter when done.
 sub calculate ( $self, $formula ) {
     die "No formula provided!\n" unless $formula;
 
-    my $iteration = 1;
-    my @stack;
+    $self->_log( " #  Token Number Stack          Operator Stack        Action    Remaining" );
+    $self->_log( "--- ----- --------------------- --------------------- --------- ---------------" );
+    $iteration = 1;
+    my $value = $self->_evaluate( $formula );
+    $iteration = 0;
+    return $value;
+}
+
+# Evaluate the function given and return the result.
+sub _evaluate ( $self, $formula ) {
+    die "No formula provided!\n" unless $formula;
+    my( @opstack, @numstack );
+
+    # 
+    # Set up reporting.
+    #
+    # This anonymous subroutine allows us to conveniently, repeatedly call this reporting
+    # method, and gives us access to all local vars in calculate(). Cool!
+    #
+    my $trace = sub ( $action = "", $token = "" ) {
+        # Generate a trace message
+        $self->_log( sprintf "%-3d %-5s %-21s %-21s %-9s %-15s",
+            $iteration,
+            $token,
+            join( ',', @numstack ),
+            join( ',', @opstack ),
+            $action,
+            $formula,
+        );
+    };
 
     while( length $formula ) {
         my( $token, $type, $arg ) = $self->_pluck_token( \$formula );
-        $self->_trace( "Iteration $iteration: Token: $token, Type: $type" );
-        $self->_trace( "Iteration $iteration: Remaining formula is '$formula'" );
-
+        
         # If it's a number, just dump it on the stack and continue.
         if( $type eq "NUM" ) {
-            push @stack, $token;
+            $trace->( "Reduce", $token );
+            push @numstack, $token;
         }
         elsif( $type eq "OP" ) {
-            # See if this operator has a higher precedence than the one at the top of the
-            # stack. If not, pop the one off the top of the stack, pop two numbers off the 
-            # number stack, evaluate the result, and push the result back on the number stack.
-            if( scalar @stack < 2 or $ops{ $token }{ order } >= $ops{ $stack[$#stack - 1] }{ order }) { 
-                push @stack, $token;
+            # Push the operator on the stack if the stack is empty, or if the precedence is 
+            # greater than to the op on top of the stack.
+            if( @opstack == 0 or $ops{ $token }{ order } >= $ops{ $opstack[-1] }{ order }) { 
+                push @opstack, $token;
+                $trace->( "Shift", $token );
             }
             else {
-                my $t2 = pop @stack;
-                my $op = pop @stack;
-                my $t1 = pop @stack;
-                my $result = $ops{ $op }{ exec }->( $t1, $t2 );
-                $self->_trace( "Iteration $iteration: calculate $t1 $op $t2 = $result" );
-                push @stack, $result;
-                push @stack, $token;
+                while( scalar @opstack > 0 and $ops{ $token }{ order } < $ops{ $opstack[-1] }{ order } ) {
+                    my $op = pop @opstack;
+                    my( $t1, $t2 ) = splice @numstack, -2, 2; # Dumb array hack
+                    my $result = $ops{ $op }{ exec }->( $t1, $t2 );
+                    push @numstack, $result;
+                    $trace->( "Evaluate", $token );
+                    ++$iteration; # This bumps the counter too...
+                }
+                $trace->( "Shift", $token );
+                push @opstack, $token;
             }
         }
         elsif( $type eq "FUNC" ) {
             my $result = $functions{ $token }{ exec }->( $arg );
-            $self->_trace( "Iteration $iteration: evaluate $token( $arg ) = $result" );
-            push @stack, $result;
+            $trace->( "Evaluate", $token );
+            push @numstack, $result;
         }
         else {
             die "Unknown token: $token\n";
         }
-        $self->_trace( "Iteration $iteration: Current stack: " . join( ',', @stack ));
 
         ++$iteration;
     }
 
-    # All done! Traverse the stacks from the bottom up and calculate the result
-    # TODO: precedence bug when high-precedence operator is at end of formula
-    my $value = shift @stack;
-    while( @stack ) {
-        my $op = shift @stack;
-        my $t1 = shift @stack;
-        my $result = $ops{ $op }{ exec }->( $value, $t1 );
-        $self->_trace( "Calculating $value $op $t1 = $result" );
+    # All done. Empty the stacks and evaluate the result.
+    my $value = pop @numstack;
+    while( @opstack ) {
+        my $op = pop @opstack;
+        my $t1 = pop @numstack;
+        my $result = $ops{ $op }{ exec }->( $t1, $value );
+        $trace->( "Calculate", $result );
+        ++$iteration; # Calculation takes time too!
         $value = $result;
     }
 
@@ -130,14 +163,13 @@ sub calculate ( $self, $formula ) {
 # There is a bit of redundant code here. This was necessited by a bug I found
 # in Perl's regex parser in the formula tokenizer. More below.
 #
-# TODO: whitepsace handling bug
 sub _pluck_token( $self, $formula ) {
     # Ignore whitespace
     $$formula =~ s/^\s+//;
 
     # Positive or negative number
     my( $token, $type, $arg );
-    if( $$formula =~ /^([+-]?\d+\.?\d*?)(.*)$/x ) {
+    if( $$formula =~ /^([-]?\d+\.?\d*?)(.*)$/x ) {
         $token    = $1;
         die "Parse error: $1 isn't an integer!\n" unless isint( $token );
         $type     = "NUM";
@@ -155,7 +187,6 @@ sub _pluck_token( $self, $formula ) {
         $type     = "FUNC";
         $$formula = $2;
         $functions{ $token } or die "Unknown function: '$token'\n";
-        $self->_trace( "Found function $token" );
 
         # Get the argument. The second regex *should* have done this, but there
         # is a bug in the Perl regex engine that is causing the second capture to 
@@ -164,11 +195,10 @@ sub _pluck_token( $self, $formula ) {
         # to work around this with a simple search-and-replace, but in doing so, I
         # had to make a little redundant code in the operator and number blocks. :(
         $$formula =~ s/^\s+//;
-        $$formula =~ /^([+-]?\d+)\s*?\)([^\)]*)$/;
+        $$formula =~ /^([-]?\d+)\s*?\)([^\)]*)$/;
         die "Parse error: ')' expected\n" unless $1;
         $arg = $1;
         $$formula =~ s/$2//g;
-        $self->_trace( "Found argument '$arg'" );
     }
     elsif( $$formula =~ /^(\()(.*)$/ ) {
         # Handle parenthetical expressions.
@@ -180,13 +210,11 @@ sub _pluck_token( $self, $formula ) {
         $$formula =~ /^(.*?)\)(.*)$/;
         die "Parse error: ')' expected\n" unless $1;
 
-        # Pass only the parenthetical piece. Make sure we remove it from the original
-        # formula.
-        my $f2 = $1;
-        $$formula =~ s/^(.*?)\)//g;
-        $self->_trace( "Nested formula is $f2, remaining is $$formula" );
-        $token = $self->calculate( $f2 );
+        # Pass only the parenthetical piece. Make sure we remove it from the original formula.
+        my $f2 = $1; $f2 =~ s/^\s+//; $f2 =~ s/\s+$//;
+        $token = $self->_evaluate( $f2 );
         $type = "NUM";
+        $$formula =~ s/^.*?\)\s*//g;
     }
     else {
         $token = $$formula;
@@ -197,13 +225,9 @@ sub _pluck_token( $self, $formula ) {
     return( $token, $type, $arg );
 }
 
-# This shows us a log/stack trace of where we are in parsing the formula provided - but
-# ONLY if we were invoked with the debugging option!
-sub _trace( $self, $message = "") {
+sub _log( $self, $message ) {
     return unless $self->debug;
-
-    my( $package, $file, $line ) = caller;
-    say STDERR sprintf "Line %3s: \"%s\"", $line, $message;
+    say STDERR $message;
 }
 
 # Auto-generate some help information in the shell
@@ -232,9 +256,6 @@ This implements a modified Shunting Yard Algorithm
 (L<https://en.wikipedia.org/wiki/Shunting-yard_algorithm>). Being a dynamic
 language, Perl makes some things a bit easier than the way Wikipedia 
 outlines the algorithm.
-
-Since Perl allows me to look back on the stack, I can implement this with a 
-single stack rather than multiple stacks.
 
 Assumes that function arguments are simple numbers. Could have expanded this
 without a lot of additional work. Could have added functions with multiple 
