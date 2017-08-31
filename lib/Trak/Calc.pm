@@ -105,11 +105,16 @@ sub _evaluate ( $self,  $formula ) {
             else {
                 while( scalar @opstack > 0 and $ops{ $token }{ order } < $ops{ $opstack[-1] }{ order } ) {
                     my $op = pop @opstack;
-                    my( $t1, $t2 ) = splice @numstack, -2, 2; # Dumb array hack
-                    my $result = $ops{ $op }{ exec }->( $t1, $t2 );
-                    push @numstack, $result;
-                    $trace->( "Evaluate", $token );
-                    ++$iteration; # This bumps the counter too...
+                    if( scalar @numstack >= 2 ) {
+                        my( $t1, $t2 ) = splice @numstack, -2, 2; # Dumb array hack
+                        my $result = $ops{ $op }{ exec }->( $t1, $t2 );
+                        push @numstack, $result;
+                        $trace->( "Evaluate", $token );
+                        ++$iteration; # This bumps the counter too...
+                    }
+                    else {
+                        die "Parse error: too many operators, not enough operands!\n";
+                    }
                 }
                 $trace->( "Shift", $token );
                 push @opstack, $token;
