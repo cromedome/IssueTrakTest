@@ -67,13 +67,13 @@ sub calculate ( $self, $formula ) {
     $self->_log( " #  Token Number Stack          Operator Stack        Action    Remaining" );
     $self->_log( "--- ----- --------------------- --------------------- --------- ---------------" );
     $iteration = 1;
-    my $value = $self->evaluate( $formula );
+    my $value = $self->_evaluate( $formula );
     $iteration = 0;
     return $value;
 }
 
 # Evaluate the function given and return the result.
-sub evaluate ( $self, $formula ) {
+sub _evaluate ( $self, $formula ) {
     die "No formula provided!\n" unless $formula;
     my( @opstack, @numstack );
 
@@ -211,7 +211,7 @@ sub _pluck_token( $self, $formula ) {
 
         # Pass only the parenthetical piece. Make sure we remove it from the original formula.
         my $f2 = $1; $f2 =~ s/^\s+//; $f2 =~ s/\s+$//;
-        $token = $self->evaluate( $f2 );
+        $token = $self->_evaluate( $f2 );
         $type = "NUM";
         $$formula =~ s/^.*?\)//g;
     }
@@ -255,9 +255,6 @@ This implements a modified Shunting Yard Algorithm
 (L<https://en.wikipedia.org/wiki/Shunting-yard_algorithm>). Being a dynamic
 language, Perl makes some things a bit easier than the way Wikipedia 
 outlines the algorithm.
-
-Since Perl allows me to look back on the stack, I can implement this with a 
-single stack rather than multiple stacks.
 
 Assumes that function arguments are simple numbers. Could have expanded this
 without a lot of additional work. Could have added functions with multiple 
