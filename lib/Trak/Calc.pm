@@ -23,16 +23,14 @@ has debug => (
 state $iteration = 0;
 
 #
-# Supported operators, their precedence (order), association (dir - L is left-to-right,
-# R is right-to-left), description (help), and implementation.
+# Supported operators, their precedence (order), description (help), and implementation.
 #
 my %ops = ( 
-    '+'  => { order => 10, dir => 'L', exec => sub { $_[0] +  $_[1] }, help => "Addition: +"        },
-    '-'  => { order => 10, dir => 'L', exec => sub { $_[0] -  $_[1] }, help => "Subtraction: -"     },
-    '*'  => { order => 20, dir => 'L', exec => sub { $_[0] *  $_[1] }, help => "Multiplication: *"  },
+    '+'  => { order => 10, exec => sub { $_[0] +  $_[1] }, help => "Addition: +"        },
+    '-'  => { order => 10, exec => sub { $_[0] -  $_[1] }, help => "Subtraction: -"     },
+    '*'  => { order => 20, exec => sub { $_[0] *  $_[1] }, help => "Multiplication: *"  },
     '/'  => { 
         order => 20, 
-        dir   => 'L',
         exec  => sub { 
             die "Calculation error: can't divide by zero!\n" if $_[1] == 0;
             $_[0] /  $_[1];
@@ -41,14 +39,13 @@ my %ops = (
     },
     '%'  => { 
         order => 20, 
-        dir   => 'L',
         exec  => sub { 
             die "Calculation error: can't mod by zero!\n" if $_[1] == 0;
             $_[0] %  $_[1];
         }, 
         help  => "Modulus: %" 
     },
-    '**' => { order => 30, dir => 'R', exec => sub { $_[0] ** $_[1] }, help => "Exponentiation: **" },
+    '**' => { order => 30, exec => sub { $_[0] ** $_[1] }, help => "Exponentiation: **" },
 );
 
 # List of functions supported
