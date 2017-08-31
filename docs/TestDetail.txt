@@ -1,0 +1,46 @@
+t/001sanity.t ... 
+ok 1 - use Trak;
+ok 2 - use Trak::Calc;
+1..2
+ok
+t/calc.t ........ 
+ok 1 - Calculator can evaluate simple formulas
+ok 2 - ...and complex ones too
+ok 3 - Calculator does basic addition
+ok 4 - ...and subtraction
+ok 5 - ...and multiplication
+ok 6 - ...and division
+ok 7 - ...but doesn't let us divide by zero
+ok 8 - ...we can do modulus too
+ok 9 - ...but again, not by zero
+ok 10 - ...and can handle exponentiation
+ok 11 - Calculator calculates square root
+ok 12 - ...and sine
+ok 13 - ...and cosine
+ok 14 - ...and tangent
+ok 15 - Calculator only works correctly with integers
+ok 16 - ...and complains when operands are not
+ok 17 - ...it handles negative numbers properly
+ok 18 - ...and weird combinations of whitespace too
+ok 19 - Calculator correctly evaluates parenthesis
+ok 20 - ...and complains when the closing paren is missing
+ok 21 - ...and thinks an unmatched ) is rightfully a problem
+ok 22 - Calculator won't try to evaluate functions it doesn't know about
+ok 23 - ...and will complain when given invalid characters
+ok 24 - ...when we enable debugging for calculator
+ok 25 - ...we get trace information on STDERR
+ok 26 - Calculator produces formula help when asked
+1..26
+ok
+t/perlcritic.t .. 
+ok - Test::Perl::Critic for "t/perlcritic.t"
+ok - Test::Perl::Critic for "t/001sanity.t"
+ok - Test::Perl::Critic for "bin/trak.pl"
+ok - Test::Perl::Critic for "lib/Trak.pm"
+ok - Test::Perl::Critic for "t/calc.t"
+ok - Test::Perl::Critic for "lib/Trak/Calc.pm"
+1..6
+ok
+All tests successful.
+Files=3, Tests=34,  1 wallclock secs ( 0.03 usr  0.00 sys +  1.33 cusr  0.13 csys =  1.49 CPU)
+Result: PASS

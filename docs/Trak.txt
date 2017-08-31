@@ -1,0 +1,54 @@
+[1mNAME[0m
+    bin/trak.pl - Run the IssueTrak formula parser
+
+[1mSYNOPSIS[0m
+        ./bin/trak.pl [--debug] [--help] [--formulahelp] [formula1] [formula2]
+
+        # If you like shorter arguments...
+        ./bin/trak.pl [-d] [-h] [-f] [formula1] [formula2]
+
+[1mOPTIONS[0m
+    debug
+        Turn on debugging. This adds a lot of information to the display when
+        the forumla parser is running.
+
+    formulahelp
+        Get help from the calculator itself. This shows a list of available
+        operators and functions.
+
+    help
+        Show this help information.
+
+    formula[1, 2, ...]
+        One or more formulas, wrapped in quotations. One formula per
+        quotation.
+
+[1mDESCRIPTION[0m
+    This program tries to parse any formulas passed through the command line
+    directly. If no formulas were given, launch an interactive shell that lets
+    the user enter a formula and execute it immediately.
+
+    The calculator is implemented by Trak::Calc. See the documentation there
+    for specifics on how it is implemented.
+
+[1mUSING THE SHELL[0m
+    When started with no formula arguments, trak.pl starts an interactive
+    shell. From this shell, you can enter a single formula from the prompt,
+    and the calculator will evaluate it and give you back an answer.
+
+    The shell has several additional commands available:
+
+    debug
+        Toggle debugging mode. When in debugging mode, you will get trace
+        output showing how the calculator arrived at a result.
+
+    exit
+        Exit the interactive shell.
+
+    help
+        Get a list of available operators and functions from the calculator.
+        Equivalent to the "--formulahelp" command line argument.
+
+[1mAUTHOR[0m
+    Jason A. Crome " jason@crome-plated.com "
+

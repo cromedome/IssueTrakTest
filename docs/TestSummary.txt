@@ -1,0 +1,6 @@
+t/001sanity.t ... ok
+t/calc.t ........ ok
+t/perlcritic.t .. ok
+All tests successful.
+Files=3, Tests=34,  1 wallclock secs ( 0.02 usr  0.00 sys +  1.35 cusr  0.14 csys =  1.51 CPU)
+Result: PASS
