@@ -1,17 +1,13 @@
 #!/usr/bin/env perl
 
 use lib './lib';
+use v5.24;
 use Test::Most;
+use Test::Output;
 use Trak::Calc;
 
 # Create a calculator for the rest of our tests
 my $calc = Trak::Calc->new;
-
-# Invalid operators
-# Invalid formulas
-# Invalid functions
-# Test parens
-# Garbage at end
 
 # Formula complexity
 cmp_ok( $calc->calculate( "1 + 2 + 3 + 4 - 5" ), '==', 5, 
@@ -39,12 +35,55 @@ lives_ok{ $calc->calculate( "sin(90)" )} "...and sine";
 lives_ok{ $calc->calculate( "cos(90)" )} "...and cosine";
 lives_ok{ $calc->calculate( "tan(90)" )} "...and tangent";
  
+# Valid numbers
+lives_ok { $calc->calculate( "1 + 2" ) } "Calculator only works correctly with integers";
+throws_ok { $calc->calculate( " 1.0 + 2.5 " ) } 
+    qr/isn't an integer/,
+    "...and complains when operands are not";
+
 # Negative numbers
 cmp_ok( $calc->calculate( "1 - -1" ), '==', 2, 
-    "Calculator handles negative numbers properly" );
+    "...it handles negative numbers properly" );
 cmp_ok( $calc->calculate( "   8     /4   +   6 / ( 4-    2   )       " ), '==', 5, 
-    "...and weird combinations of whitespace" );
+    "...and weird combinations of whitespace too" );
 
-# Throw my other examples in here too...
+# Test parens
+lives_ok { $calc->calculate( "(1 + 2) / (7 - 4)" ) } "Calculator correctly evaluates parenthesis";
+throws_ok { $calc->calculate( "(1 + 2) / (7 - 4" ) } 
+    qr/'\)' expected/,
+    "...and complains when the closing paren is missing";
+throws_ok { $calc->calculate( "(1 + 2) / (7 - 4))" ) } 
+    qr/Unknown token: \)/,
+    "...and thinks an unmatched ) is rightfully a problem";
+
+# Invalid functions
+throws_ok { $calc->calculate( "foo(2)" ) } 
+    qr/Unknown function: 'foo'/,
+    "Calculator won't try to evaluate functions it doesn't know about";
+
+# Garbage at end
+throws_ok { $calc->calculate( "(1 + 2) / (7 - 4) &^" ) } 
+    qr/Unknown token/,
+    "...and will complain when given invalid characters";
+
+
+# Look at calculator output
+sub capture_calc_output {
+    $calc->calculate( "1+1" );
+}
+
+# Make sure debugging output is generated when we want it
+$calc->debug( 1 );
+ok( $calc->debug, "...when we enable debugging for calculator" );
+
+stderr_like( \&capture_calc_output,
+    qr/Token Number Stack/,
+    '...we get trace information on STDERR' );
+
+# Help!
+stdout_like { print $calc->help } 
+    qr/The following operators/,
+    "Calculator produces formula help when asked";
+
 done_testing;
 

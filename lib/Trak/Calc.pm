@@ -205,7 +205,7 @@ sub _pluck_token( $self, $formula ) {
         # These aren't tokens per se, but they are something that get picked up during
         # formula parsing. When we find one, run it back through calculate() to solve
         # it, then put the result on the stack in place of the expression.
-        die "Parse error: expected ')'\n" unless $2;
+        die "Parse error: ')' expected\n" unless $2;
         $$formula = $2;
         $$formula =~ /^(.*?)\)(.*)$/;
         die "Parse error: ')' expected\n" unless $1;
