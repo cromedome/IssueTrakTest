@@ -72,6 +72,8 @@ sub calculate ( $ self, $formula ) {
 # Evaluate the function given and return the result.
 sub _evaluate ( $self,  $formula ) {
     die "No formula provided!\n" unless $formula;
+    $formula =~ s/^\s+//; # Remove leading whitespace
+
     my( @opstack, @numstack );
 
     # This anonymous subroutine allows us to conveniently, repeatedly call this reporting
@@ -136,7 +138,7 @@ sub _evaluate ( $self,  $formula ) {
     my $value = pop @numstack;
     while( @opstack ) {
         my $op = pop @opstack;
-        my $t1 = pop @numstack;
+        my $t1 = pop @numstack or die "Parse error: too many operators, not enough operands!\n";
         my $result = $ops{ $op }{ exec }->( $t1, $value );
         $trace->( "Calculate", $result );
         ++$iteration; # Calculation takes time too!
@@ -161,9 +163,6 @@ sub _evaluate ( $self,  $formula ) {
 # in Perl's regex parser in the formula tokenizer. More below.
 #
 sub _pluck_token( $self, $formula ) {
-    # Ignore whitespace
-    $$formula =~ s/^\s+//;
-
     # Positive or negative number
     my( $token, $type, $arg );
     if( $$formula =~ /^([-]?\d+\.?\d*?)(.*)$/x ) {
@@ -218,6 +217,7 @@ sub _pluck_token( $self, $formula ) {
         $type  = "UNKNOWN";
     }
 
+    $$formula =~ s/^\s+//; # Remove whitespace
     $arg //= ""; # Make sure arg is at least empty string
     return( $token, $type, $arg );
 }

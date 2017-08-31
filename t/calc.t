@@ -66,11 +66,14 @@ throws_ok { $calc->calculate( "(1 + 2) / (7 - 4) &^" ) }
     qr/Unknown token/,
     "...and will complain when given invalid characters";
 
-# Broken formula
+# Broken formulas
 throws_ok { $calc->calculate( "3 * - 1" ) } 
     qr/Parse error: too many operators, not enough operands/,
     "...and will fail when given an invalid formula";
 
+throws_ok { $calc->calculate( "3 ** " ) } 
+    qr/Parse error: too many operators, not enough operands/,
+    "...and will fail when given too few operands";
 
 # Look at calculator output
 sub capture_calc_output {
