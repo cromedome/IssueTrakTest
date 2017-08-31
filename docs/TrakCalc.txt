@@ -39,9 +39,9 @@
     Addition (+)
     Subtraction (-)
     Multiplication (*)
-    Division (//
+    Division (/)
     Modulus (%)
-    Exponentiation (**)
+    Exponentiation (^)
     Parenthesis ()
 
   [1mSUPPORTED FUNCTIONS[0m

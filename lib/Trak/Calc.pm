@@ -302,7 +302,7 @@ The following operators are supported:
 
 =item Multiplication (*)
 
-=item Division (//
+=item Division (/)
 
 =item Modulus (%)
 
