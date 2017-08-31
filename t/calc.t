@@ -29,7 +29,11 @@ throws_ok { $calc->calculate( "5%0" ) }
     "...but again, not by zero";
 cmp_ok( $calc->calculate( "2 ^ 3" ), '==', 8, "...and can handle exponentiation" );
 
- # Functions
+# Implicit multiplication
+cmp_ok( $calc->calculate( "5(4+1)" ), '==', 25, '...as well as implicit multiplication' );
+cmp_ok( $calc->calculate( "(3+2)(4+1)" ), '==', 25, '...in a couple of different fashions' );
+
+# Functions
 cmp_ok( $calc->calculate( "sqrt(9)" ), '==', 3, "Calculator calculates square root" );
 lives_ok{ $calc->calculate( "sin(90)" )} "...and sine";
 lives_ok{ $calc->calculate( "cos(90)" )} "...and cosine";

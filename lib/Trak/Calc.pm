@@ -90,12 +90,14 @@ sub _evaluate ( $self,  $formula ) {
     };
 
     while( length $formula ) {
+        #$formula =~ s/([\d\)])\(/$1*(/; # Treat any operand next to a paren as multiplication
         my( $token, $type, $arg ) = $self->_pluck_token( \$formula );
         
         # If it's a number, just dump it on the stack and continue.
         if( $type eq "NUM" ) {
             $trace->( "Reduce", $token );
             push @numstack, $token;
+            $formula = "*${formula}" if $formula =~ /^\(/; # Treat any operand next to a paren as multiplication
         }
         elsif( $type eq "OP" ) {
             # Push the operator on the stack if the stack is empty, or if the precedence is 
@@ -211,6 +213,7 @@ sub _pluck_token( $self, $formula ) {
         $token = $self->_evaluate( $f2 );
         $type = "NUM";
         $$formula =~ s/^.*?\)\s*//g;
+        $$formula = "*$${formula}" if $$formula =~ /^\(/; # Treat any operand next to a paren as multiplication
     }
     else {
         $token = $$formula;
@@ -233,6 +236,7 @@ sub help {
     $message .= '- ' . $ops{ $_ }{ help } . "\n" foreach keys %ops;
     $message .= "\nThe following functions are also available:\n";
     $message .= '- ' . $functions{ $_ }{ help } . "\n" foreach keys %functions;
+    $message .="\nImplicit multiplication (i.e. \"5(4+1)\") is also supported.";
 
     return "$message\n";
 }
@@ -301,6 +305,9 @@ The following operators are supported:
 =item Subtraction (-)
 
 =item Multiplication (*)
+
+Multiplication also works implicitly: i.e., "5(4+1)" is evaluated to be 25,
+as is "(3+2)(4+1)".
 
 =item Division (/)
 
