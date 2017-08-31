@@ -152,7 +152,7 @@ sub _evaluate ( $self,  $formula ) {
 # gets smaller. When we reach the end of the formula, we know it's time
 # to calculate.
 #
-# There is a bit of redundant code here. This was necessited by a bug I found
+# There is a bit of redundant code here. This was necessitated by a bug I found
 # in Perl's regex parser in the formula tokenizer. More below.
 #
 sub _pluck_token( $self, $formula ) {
@@ -195,7 +195,7 @@ sub _pluck_token( $self, $formula ) {
     elsif( $$formula =~ /^(\()(.*)$/ ) {
         # Handle parenthetical expressions.
         # These aren't tokens per se, but they are something that get picked up during
-        # formula parsing. When we find one, run it back through calculate() to solve
+        # formula parsing. When we find one, run it back through _evaluate() to solve
         # it, then put the result on the stack in place of the expression.
         die "Parse error: ')' expected\n" unless $2;
         $$formula = $2;
