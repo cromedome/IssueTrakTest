@@ -61,7 +61,7 @@ my %functions = (
 
 # Calculate is a front-end for evaluate. It throws up a report header, runs the calculation,
 # and resets the interation counter when done.
-sub calculate ( $self, $formula ) {
+sub calculate ( $ self, $formula ) {
     die "No formula provided!\n" unless $formula;
 
     $self->_log( " #  Token Number Stack          Operator Stack        Action    Remaining" );
@@ -73,7 +73,7 @@ sub calculate ( $self, $formula ) {
 }
 
 # Evaluate the function given and return the result.
-sub _evaluate ( $self, $formula ) {
+sub _evaluate ( $self,  $formula ) {
     die "No formula provided!\n" unless $formula;
     my( @opstack, @numstack );
 
@@ -253,13 +253,68 @@ Trak::Calc - implement a calculator/forumla parser and evaluator in Perl.
 =head1 DESCRIPTION
 
 This implements a modified Shunting Yard Algorithm 
-(L<https://en.wikipedia.org/wiki/Shunting-yard_algorithm>). Being a dynamic
-language, Perl makes some things a bit easier than the way Wikipedia 
-outlines the algorithm (and its creator, for that matter).
+(L<https://en.wikipedia.org/wiki/Shunting-yard_algorithm>). For the most part,
+we adhere to the process described, but Perl being a dynamic makes some 
+implementation details a bit easier. 
 
-Assumes that function arguments are simple numbers. Could have expanded this
-without a lot of additional work. Could have added functions with multiple 
-arguments with not a lot of additional work.
+=head2 ASSUMPTIONS/REQUIREMENTS
 
-Assumed you wanted integers, and that is what the tokenizer checks for.
+From the email explaining the test requirements, the calculator was designed
+to meet the following requirements:
 
+=over 4
+
+=item *
+
+Operands B<must> be integers.
+
+=item *
+
+Don't assume that operands, operators, and functions will be regularly spaced
+apart (this made parsing interesting!).
+
+=back
+
+=head1 HOW IT WORKS
+
+C<_evaluate()> is invoked with a single formula. The method iterates over that
+formula, calling C<_pluck_token()> to pull the next token from the left side
+of the formula. The token is returned, and is either pushed on the number 
+stack, the operator stack, or is evaluated as a function. When it runs out
+of tokens, C<_evaluate()> starts popping operators and operands off their
+respective stacks and works its way to an eventual result.
+
+C<_pluck_token()> actually does a fair amount of heavy lifting. Since there 
+is no guarantee that tokens are evenly spaced (or spaced at all), some 
+rather complicated regular expressions were needed to extract each type of
+token from the formula (rather than simply splitting the formula on any 
+whitespace). When it identifies a token, it returns the token and its type
+(number, operator, or function) back to C<_evaluate()>. If it finds a 
+parenthetical expression, it calls C<_evaluate()> with the contents of that
+expression.
+
+=head2 SUPPORTED OPERATORS
+
+=head2 SUPPORTED FUNCTIONS
+
+=head2 WRITING YOU OWN OPERATORS AND FUNCTIONS
+
+=head1 PUBLIC METHODS
+
+=head2 calculate()
+
+=head2 help()
+
+=head1 PRIVATE METHODS
+
+=head2 _evaluate()
+
+=head2 _log()
+
+=head2 _pluck_token()
+
+=head1 AUTHOR
+
+Jason A. Crome C< jason@crome-plated.com >
+
+=cut

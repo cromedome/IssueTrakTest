@@ -153,6 +153,8 @@ Exit the interactive shell.
 Get a list of available operators and functions from the calculator. Equivalent
 to the C<--formulahelp> command line argument.
 
+=back
+
 =head1 AUTHOR
 
 Jason A. Crome C< jason@crome-plated.com >
