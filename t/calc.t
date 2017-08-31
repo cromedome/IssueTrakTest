@@ -12,7 +12,7 @@ my $calc = Trak::Calc->new;
 # Formula complexity
 cmp_ok( $calc->calculate( "1 + 2 + 3 + 4 - 5" ), '==', 5, 
     "Calculator can evaluate simple formulas" );
-cmp_ok( $calc->calculate( "(1 + 2 ** 3 ) / 3 - ( 4 - 5)" ), '==', 4, 
+cmp_ok( $calc->calculate( "(1 + 2 ^ 3 ) / 3 - ( 4 - 5)" ), '==', 4, 
     "...and complex ones too" );
 
 # Operator tests
@@ -27,7 +27,7 @@ cmp_ok( $calc->calculate( "7 % 4" ), '==', 3, "...we can do modulus too" );
 throws_ok { $calc->calculate( "5%0" ) } 
      "/mod by zero/",
     "...but again, not by zero";
-cmp_ok( $calc->calculate( "2 ** 3" ), '==', 8, "...and can handle exponentiation" );
+cmp_ok( $calc->calculate( "2 ^ 3" ), '==', 8, "...and can handle exponentiation" );
 
  # Functions
 cmp_ok( $calc->calculate( "sqrt(9)" ), '==', 3, "Calculator calculates square root" );
@@ -71,7 +71,7 @@ throws_ok { $calc->calculate( "3 * - 1" ) }
     qr/Parse error: too many operators, not enough operands/,
     "...and will fail when given an invalid formula";
 
-throws_ok { $calc->calculate( "3 ** " ) } 
+throws_ok { $calc->calculate( "3 ^ " ) } 
     qr/Parse error: too many operators, not enough operands/,
     "...and will fail when given too few operands";
 
