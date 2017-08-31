@@ -295,23 +295,95 @@ expression.
 
 =head2 SUPPORTED OPERATORS
 
+The following operators are supported:
+
+=over 4
+
+=item Addition (+)
+
+=item Subtraction (-)
+
+=item Multiplication (*)
+
+=item Division (//
+
+=item Modulus (%)
+
+=item Exponentiation (**)
+
+=item Parenthesis ()
+
+=back
+
 =head2 SUPPORTED FUNCTIONS
 
+The following functions are also supported:
+
+=over 4
+
+=item Square Root - sqrt(x)
+
+=item Sine - sin(x)
+
+=item Cosine - cos(x)
+
+=item Tangent - tan(x)
+
+=back
+
 =head2 WRITING YOU OWN OPERATORS AND FUNCTIONS
+
+It's pretty easy to add your own operators. In the C<%ops> hash, the character
+representing the operator must be provided, its order of precedence (higher
+values are evaluated first), a help description (which is shown by the C<help()>
+method) and finally, an anonymous subroutine that takes two arguments and 
+implements said operator.
+
+Functions work rather similarly. In the C<%functions> hash, a function name 
+must be provided, along with a help description, and finally, a single-argument
+anonymous function that implements that function. Currently, functions may only
+take a single argument, and contents in the argument are not evaluated as a 
+mathematical expression.
 
 =head1 PUBLIC METHODS
 
 =head2 calculate()
 
+This is the public interface to the calculator. When it is called, it sets up
+the trace report, and invokes C<_evaluate()> for the function provided. It
+takes a single argument: the function to be evaluated.
+
+=head2 debug()
+
+When called with no arguments, returns a boolean that indicates whether or not
+debugging is enabled. When passed a boolean argument, enables or disables 
+debugging.
+
 =head2 help()
+
+Returns an auto-generated help page showing the supported list of operators 
+and functions. Takes no arguments.
 
 =head1 PRIVATE METHODS
 
 =head2 _evaluate()
 
+This is the brain of the calculator, and does the actual work of calculation.
+Takes a single argument: the function to be evaluated. Returns the result of
+the evaluation.
+
 =head2 _log()
 
+A convenience method to send a message to C<STDERR>. Takes a single argument:
+the message to be logged. If we are not in debugging mode, this method does
+nothing. 
+
 =head2 _pluck_token()
+
+When given a formula, plucks the next token off the left side of it. Plucking
+is a destructive operation, and as such, the formula must be passed by 
+reference. Returns a list that contains the token, the type of the token (NUM,
+OP, or FUNC), and in the case of a function, an optional argument item.
 
 =head1 AUTHOR
 
