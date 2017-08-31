@@ -248,14 +248,14 @@ __END__
 
 =head1 NAME
 
-Trak::Calc
+Trak::Calc - implement a calculator/forumla parser and evaluator in Perl.
 
 =head1 DESCRIPTION
 
 This implements a modified Shunting Yard Algorithm 
 (L<https://en.wikipedia.org/wiki/Shunting-yard_algorithm>). Being a dynamic
 language, Perl makes some things a bit easier than the way Wikipedia 
-outlines the algorithm.
+outlines the algorithm (and its creator, for that matter).
 
 Assumes that function arguments are simple numbers. Could have expanded this
 without a lot of additional work. Could have added functions with multiple 
