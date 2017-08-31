@@ -74,14 +74,9 @@ sub _evaluate ( $self,  $formula ) {
     die "No formula provided!\n" unless $formula;
     my( @opstack, @numstack );
 
-    # 
-    # Set up reporting.
-    #
     # This anonymous subroutine allows us to conveniently, repeatedly call this reporting
     # method, and gives us access to all local vars in calculate(). Cool!
-    #
     my $trace = sub ( $action = "", $token = "" ) {
-        # Generate a trace message
         $self->_log( sprintf "%-3d %-5s %-21s %-21s %-9s %-15s",
             $iteration,
             $token,
