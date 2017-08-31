@@ -39,6 +39,9 @@
     Addition (+)
     Subtraction (-)
     Multiplication (*)
+        Multiplication also works implicitly: i.e., "5(4+1)" is evaluated to
+        be 25, as is "(3+2)(4+1)".
+
     Division (/)
     Modulus (%)
     Exponentiation (^)
