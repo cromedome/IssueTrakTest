@@ -55,16 +55,21 @@ my %ops = (
 
 # List of functions supported
 my %functions = (
-    # TODO: negative sqrt()
-    sqrt => { help => "Square Root: sqrt(x)", exec => sub { _check_args(1, @_); return sqrt shift; }},
+    # TODO: check for infinite tan
+    sqrt => { 
+        help => "Square Root: sqrt(x)", 
+        exec => sub { 
+            _check_args(1, @_); 
+            my $arg = shift;
+            die "Caclulation error: can't take square root of a negative number!\n" if $arg < 0;
+            return sqrt $arg; 
+        }},
     sin  => { help => "Sine: sin(x)",         exec => sub { _check_args(1, @_); return sin shift;  }}, 
     cos  => { help => "Cosine: cos(x)",       exec => sub { _check_args(1, @_); return cos shift;  }}, 
     tan  => { help => "Tangent: tan(x)",      exec => sub { _check_args(1, @_); return tan shift;  }}, 
     pi   => { help => "Pi: pi()",             exec => sub { _check_args(0, @_); return pi();       }},
 );
 
-# TODO: document
-# TODO: document multi arg functions?
 sub _check_args( $count, @arglist ) {
     die "Parse error: got " . scalar @arglist . " arguments, expected $count!\n"
         if $count != scalar @arglist;
@@ -387,6 +392,13 @@ Returns an auto-generated help page showing the supported list of operators
 and functions. Takes no arguments.
 
 =head1 PRIVATE METHODS
+
+=head2 _check_args()
+
+This is called from function implementations to validate the number of 
+arguments being passed to the function. The first argument is the expected
+number of arguments, and the second argument is the list of arguments to
+the function.
 
 =head2 _evaluate()
 

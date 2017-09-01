@@ -40,6 +40,9 @@ cmp_ok( $calc->calculate( "(3+2)(4+1)" ), '==', 25, '...in a couple of different
 
 # Functions
 cmp_ok( $calc->calculate( "sqrt(9)" ), '==', 3, "Calculator calculates square root" );
+throws_ok { $calc->calculate( "sqrt(-1)" ) }
+    qr/can't take square root of a negative number/,
+    "...but not the square root of negative numbers";
 lives_ok{ $calc->calculate( "sin(90)" )} "...and sine";
 lives_ok{ $calc->calculate( "cos(90)" )} "...and cosine";
 lives_ok{ $calc->calculate( "tan(90)" )} "...and tangent";
