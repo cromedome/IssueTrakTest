@@ -209,7 +209,7 @@ sub _pluck_token( $self, $formula ) {
         $type     = "FUNC";
         $$formula = $2;
         $functions{ $token } or die "Unknown function: '$token'\n";
-
+        
         # Get the argument. The second regex *should* have done this, but there
         # is a bug in the Perl regex engine that is causing the second capture to 
         # be extra greedy. I checked this regex against a few different data strings
@@ -220,7 +220,7 @@ sub _pluck_token( $self, $formula ) {
         $$formula =~ /^(\(.*?\))([^\)]*)$/;
         die "Parse error: ')' expected\n" unless $1;
         $$formula =~ s/$2//g;
-        $arg = $1; $arg =~ s/\(|\s*?|\)//g;
+        $arg = $1; $arg =~ s/^\s*?\(\s*?\)\s*?$//g;
         $arg = $self->_evaluate($arg) if $arg;
     }
     elsif( $$formula =~ /^(\()(.*)$/ ) {
@@ -231,6 +231,7 @@ sub _pluck_token( $self, $formula ) {
         die "Parse error: ')' expected\n" unless $2;
         $$formula = $2;
         $$formula =~ /^(.*?)\)(.*)$/;
+        #$$formula =~ /^(.*?\)?)\){1}(.*)$/;
         die "Parse error: ')' expected\n" unless $1 ne '';
 
         # Pass only the parenthetical piece. Make sure we remove it from the original formula.
@@ -238,6 +239,7 @@ sub _pluck_token( $self, $formula ) {
         $token = $self->_evaluate( $f2 );
         $type = "NUM";
         $$formula =~ s/^.*?\)\s*//g;
+        #$$formula =~ s/^.*\)\s*//g;
         $$formula = "*$${formula}" if $$formula =~ /^\(/; # Treat any operand next to a paren as multiplication
     }
     else {
