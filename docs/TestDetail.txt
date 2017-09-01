@@ -13,39 +13,40 @@ ok 6 - ...and division
 ok 7 - ...but doesn't let us divide by zero
 ok 8 - ...we can do modulus too
 ok 9 - ...but again, not by zero
-ok 10 - ...and can handle exponentiation
-ok 11 - ...even several strung together
-ok 12 - ...as well as implicit multiplication
-ok 13 - ...in a couple of different fashions
-ok 14 - Calculator calculates square root
-ok 15 - ...and sine
-ok 16 - ...and cosine
-ok 17 - ...and tangent
-ok 18 - Calculator only works correctly with integers
-ok 19 - ...and complains when operands are not
-ok 20 - ...it handles negative numbers properly
-ok 21 - ...and weird combinations of whitespace too
-ok 22 - Calculator correctly evaluates parenthesis
-ok 23 - ...and complains when the closing paren is missing
-ok 24 - ...and thinks an unmatched ) is rightfully a problem
-ok 25 - Calculator won't try to evaluate functions it doesn't know about
-ok 26 - ...and will complain when given invalid characters
-ok 27 - ...and will fail when given an invalid formula
-ok 28 - ...and will fail when given too few operands
-ok 29 - ...when we enable debugging for calculator
-ok 30 - ...we get trace information on STDERR
-ok 31 - Calculator produces formula help when asked
-1..31
+ok 10 - ...and the divisor must be an integer
+ok 11 - ...and can handle exponentiation
+ok 12 - ...even several strung together
+ok 13 - ...as well as implicit multiplication
+ok 14 - ...in a couple of different fashions
+ok 15 - Calculator calculates square root
+ok 16 - ...and sine
+ok 17 - ...and cosine
+ok 18 - ...and tangent
+ok 19 - Calculator only works correctly with integers
+ok 20 - ...and complains when operands are not
+ok 21 - ...it handles negative numbers properly
+ok 22 - ...and weird combinations of whitespace too
+ok 23 - Calculator correctly evaluates parenthesis
+ok 24 - ...and complains when the closing paren is missing
+ok 25 - ...and thinks an unmatched ) is rightfully a problem
+ok 26 - Calculator won't try to evaluate functions it doesn't know about
+ok 27 - ...and will complain when given invalid characters
+ok 28 - ...and will fail when given an invalid formula
+ok 29 - ...and will fail when given too few operands
+ok 30 - ...when we enable debugging for calculator
+ok 31 - ...we get trace information on STDERR
+ok 32 - Calculator produces formula help when asked
+1..32
 ok
 t/perlcritic.t .. 
-ok - Test::Perl::Critic for "bin/trak.pl"
-ok - Test::Perl::Critic for "t/001sanity.t"
 ok - Test::Perl::Critic for "t/perlcritic.t"
+ok - Test::Perl::Critic for "t/001sanity.t"
+ok - Test::Perl::Critic for "bin/trak.pl"
 ok - Test::Perl::Critic for "lib/Trak.pm"
 ok - Test::Perl::Critic for "t/calc.t"
 ok - Test::Perl::Critic for "lib/Trak/Calc.pm"
 1..6
 ok
 All tests successful.
-Files=3, Tests=39,  1 wallclock secs ( 0.01 usr  0.00 sys +  1.32 cusr  0.11 csys =  1.44 CPU)
+Files=3, Tests=40,  1 wallclock secs ( 0.02 usr  0.00 sys +  1.36 cusr  0.12 csys =  1.50 CPU)
 Result: PASS

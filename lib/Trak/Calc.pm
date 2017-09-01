@@ -44,6 +44,8 @@ my %ops = (
         dir   => 'L',
         exec  => sub { 
             die "Calculation error: can't mod by zero!\n" if $_[1] == 0;
+            warn "Calculation error: divisor must be integer! Truncating $_[1] to integer.\n",
+                unless isint( $_[1] );
             $_[0] %  $_[1];
         }, 
         help  => "Modulus: %" 

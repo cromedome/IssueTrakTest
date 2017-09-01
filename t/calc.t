@@ -3,6 +3,7 @@
 use lib './lib';
 use v5.24;
 use Test::Most;
+use Test::Warn;
 use Test::Output;
 use Trak::Calc;
 
@@ -27,6 +28,9 @@ cmp_ok( $calc->calculate( "7 % 4" ), '==', 3, "...we can do modulus too" );
 throws_ok { $calc->calculate( "5%0" ) } 
      "/mod by zero/",
     "...but again, not by zero";
+warning_like { $calc->calculate( "5%(4/3)" ) } 
+     qr/must be integer/,
+    "...and the divisor must be an integer";
 cmp_ok( $calc->calculate( "2 ^ 3" ), '==', 8, "...and can handle exponentiation" );
 cmp_ok( $calc->calculate( "3 ^ 2 ^ 2" ), '==', 81, "...even several strung together" );
 

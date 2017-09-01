@@ -43,6 +43,7 @@ on 'develop' => sub {
 on 'test' => sub {
     requires 'Test::More';
     requires 'Test::Most';
+    requires 'Test::Warn';
     requires 'Test::Output';
     requires 'Perl::Critic';
     requires 'Perl::Critic::Policy::Miscellanea::RequireRcsKeywords';
