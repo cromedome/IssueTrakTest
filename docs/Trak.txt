@@ -1,11 +1,11 @@
 [1mNAME[0m
-    bin/trak.pl - Run the IssueTrak formula parser
+    trak.pl - Run the IssueTrak formula parser
 
 [1mSYNOPSIS[0m
-        ./bin/trak.pl [--debug] [--help] [--formulahelp] [formula1] [formula2]
+        ./trak.pl [--debug] [--help] [--formulahelp] [formula1] [formula2]
 
         # If you like shorter arguments...
-        ./bin/trak.pl [-d] [-h] [-f] [formula1] [formula2]
+        ./trak.pl [-d] [-h] [-f] [formula1] [formula2]
 
 [1mOPTIONS[0m
     debug

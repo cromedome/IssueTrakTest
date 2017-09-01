@@ -370,8 +370,8 @@ implements said operator.
 Functions work rather similarly. In the C<%functions> hash, a function name 
 must be provided, along with a help description, and finally, a single-argument
 anonymous function that implements that function. Currently, functions may only
-take a single argument, and contents in the argument are not evaluated as a 
-mathematical expression.
+take 0 or 1 arguments. Contents of the argument list are evaluated as 
+parenthetical expressions.
 
 =head1 PUBLIC METHODS
 

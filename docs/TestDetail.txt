@@ -18,33 +18,37 @@ ok 12 - ...even several strung together
 ok 13 - ...as well as implicit multiplication
 ok 14 - ...in a couple of different fashions
 ok 15 - Calculator calculates square root
-ok 16 - ...and sine
-ok 17 - ...and cosine
-ok 18 - ...and tangent
-ok 19 - Calculator only works correctly with integers
-ok 20 - ...and complains when operands are not
-ok 21 - ...it handles negative numbers properly
-ok 22 - ...and weird combinations of whitespace too
-ok 23 - Calculator correctly evaluates parenthesis
-ok 24 - ...and complains when the closing paren is missing
-ok 25 - ...and thinks an unmatched ) is rightfully a problem
-ok 26 - Calculator won't try to evaluate functions it doesn't know about
-ok 27 - ...and will complain when given invalid characters
-ok 28 - ...and will fail when given an invalid formula
-ok 29 - ...and will fail when given too few operands
-ok 30 - ...when we enable debugging for calculator
-ok 31 - ...we get trace information on STDERR
-ok 32 - Calculator produces formula help when asked
-1..32
+ok 16 - ...but not the square root of negative numbers
+ok 17 - ...and sine
+ok 18 - ...and cosine
+ok 19 - ...and tangent
+ok 20 - ...and zero argument functions, like pi()
+ok 21 - ...and even evaluates simple expressions in argument lists
+ok 22 - Calculator only works correctly with integers
+ok 23 - ...and complains when operands are not
+ok 24 - ...it handles negative numbers properly
+ok 25 - ...and weird combinations of whitespace too
+ok 26 - Calculator correctly evaluates parenthesis
+ok 27 - ...and complains when the closing paren is missing
+ok 28 - ...and thinks an unmatched ) is rightfully a problem
+ok 29 - Calculator won't try to evaluate functions it doesn't know about
+ok 30 - ...and will fail when an argument is expected but not provided
+ok 31 - ...and will complain when given invalid characters
+ok 32 - ...and will fail when given an invalid formula
+ok 33 - ...and will fail when given too few operands
+ok 34 - Bug where calculator failed when first operand was 0
+ok 35 - ...when we enable debugging for calculator
+ok 36 - ...we get trace information on STDERR
+ok 37 - Calculator produces formula help when asked
+1..37
 ok
 t/perlcritic.t .. 
-ok - Test::Perl::Critic for "t/001sanity.t"
-ok - Test::Perl::Critic for "t/perlcritic.t"
-ok - Test::Perl::Critic for "bin/trak.pl"
 ok - Test::Perl::Critic for "t/calc.t"
 ok - Test::Perl::Critic for "lib/Trak.pm"
-1..5
+ok - Test::Perl::Critic for "t/perlcritic.t"
+ok - Test::Perl::Critic for "t/001sanity.t"
+1..4
 ok
 All tests successful.
-Files=3, Tests=38,  1 wallclock secs ( 0.01 usr  0.00 sys +  1.22 cusr  0.14 csys =  1.37 CPU)
+Files=3, Tests=42,  1 wallclock secs ( 0.02 usr  0.00 sys +  1.14 cusr  0.10 csys =  1.26 CPU)
 Result: PASS

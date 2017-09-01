@@ -2,5 +2,5 @@ t/001sanity.t ... ok
 t/calc.t ........ ok
 t/perlcritic.t .. ok
 All tests successful.
-Files=3, Tests=38,  1 wallclock secs ( 0.03 usr  0.00 sys +  1.21 cusr  0.13 csys =  1.37 CPU)
+Files=3, Tests=42,  1 wallclock secs ( 0.02 usr  0.00 sys +  1.17 cusr  0.09 csys =  1.28 CPU)
 Result: PASS

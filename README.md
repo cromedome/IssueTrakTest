@@ -43,13 +43,13 @@ There are a few different ways to invoke the application:
 
 ```
 # Run in interactive mode, no debugging:
-c:\projectdir> perl bin\trak.pl
+c:\projectdir> perl trak.pl
 
 # Run in interactive mode with debugging:
-c:\projectdir> perl bin\trak.pl -d
+c:\projectdir> perl trak.pl -d
 
 # Evaluate a specific formula with debugging:
-c:\projectdir> perl bin\trak.pl -d "1 + 2 * 3 + 4"
+c:\projectdir> perl trak.pl -d "1 + 2 * 3 + 4"
 
 ```
 
@@ -78,8 +78,8 @@ project directory. To view documentation straight from the application itself,
 use `perldoc`:
 
 ```
-c:\projectdir> perldoc bin/trak.pl
-c:\projectdir> perldoc lib/Trak/Calc.pm
+c:\projectdir> perldoc trak.pl
+c:\projectdir> perldoc lib/Trak.pm
 
 ```
 

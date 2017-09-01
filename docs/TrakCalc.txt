@@ -65,8 +65,8 @@
     Functions work rather similarly. In the %functions hash, a function name
     must be provided, along with a help description, and finally, a
     single-argument anonymous function that implements that function.
-    Currently, functions may only take a single argument, and contents in the
-    argument are not evaluated as a mathematical expression.
+    Currently, functions may only take 0 or 1 arguments. Contents of the
+    argument list are evaluated as parenthetical expressions.
 
 [1mPUBLIC METHODS[0m
   [1mcalculate()[0m
@@ -84,6 +84,12 @@
     operators and functions. Takes no arguments.
 
 [1mPRIVATE METHODS[0m
+  [1m_check_args()[0m
+    This is called from function implementations to validate the number of
+    arguments being passed to the function. The first argument is the expected
+    number of arguments, and the second argument is the list of arguments to
+    the function.
+
   [1m_evaluate()[0m
     This is the brain of the calculator, and does the actual work of
     calculation. Takes a single argument: the function to be evaluated.
