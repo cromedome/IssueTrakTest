@@ -65,7 +65,6 @@ my %functions = (
         }},
     sin  => { help => "Sine: sin(x)",         exec => sub { _check_args(1, @_); return sin shift;  }}, 
     cos  => { help => "Cosine: cos(x)",       exec => sub { _check_args(1, @_); return cos shift;  }}, 
-    # TODO: check for infinite tan
     tan  => { help => "Tangent: tan(x)",      exec => sub { _check_args(1, @_); return tan shift;  }}, 
     pi   => { help => "Pi: pi()",             exec => sub { _check_args(0, @_); return pi();       }},
 );
@@ -216,8 +215,7 @@ sub _pluck_token( $self, $formula ) {
         # at regex101.com and in Oyster and the regex works as intended... I was able
         # to work around this with a simple search-and-replace, but in doing so, I
         # had to make a little redundant code in the operator and number blocks. :(
-        $$formula =~ s/^\s+//;
-        $$formula =~ /^(\(.*?\))([^\)]*)$/;
+        $$formula =~ s/^\s+//; $$formula =~ /^(\(.*?\))([^\)]*)$/;
         die "Parse error: ')' expected\n" unless $1;
         $$formula =~ s/$2//g;
         $arg = $1; $arg =~ s/^\s*?\(\s*?\)\s*?$//g;
@@ -372,8 +370,8 @@ implements said operator.
 Functions work rather similarly. In the C<%functions> hash, a function name 
 must be provided, along with a help description, and finally, a single-argument
 anonymous function that implements that function. Currently, functions may only
-take 0 or 1 arguments. Contents of the argument list are evaluated as 
-parenthetical expressions.
+take 0 or 1 arguments. Simple expressions (i.e, no function calls) in argument
+lists are evaluated as parenthetical expressions.
 
 =head1 PUBLIC METHODS
 
