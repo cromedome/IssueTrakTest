@@ -10,7 +10,7 @@ use namespace::autoclean; # Clean up imported symbols after compilation
 
 # Everything else
 use Scalar::Util::Numeric qw( isint );
-use Math::Trig;
+use Math::Trig qw( tan pi );
 
 # Are we debugging? Create get/set methods and let us change this at runtime.
 has debug => (
@@ -55,15 +55,15 @@ my %ops = (
 
 # List of functions supported
 my %functions = (
-    sqrt => { help => "Square Root: sqrt( x )", exec => sub { return sqrt shift; }},
-    sin  => { help => "Sine: sin(x)",           exec => sub { return sin shift;  }}, 
-    cos  => { help => "Cosine: cos(x)",         exec => sub { return cos shift;  }}, 
-    tan  => { help => "Tangent: tan(x)",        exec => sub { return tan shift;  }}, 
+    sqrt => { help => "Square Root: sqrt(x)", exec => sub { return sqrt shift; }},
+    sin  => { help => "Sine: sin(x)",         exec => sub { return sin shift;  }}, 
+    cos  => { help => "Cosine: cos(x)",       exec => sub { return cos shift;  }}, 
+    tan  => { help => "Tangent: tan(x)",      exec => sub { return tan shift;  }}, 
 );
 
 # Calculate is a front-end for evaluate. It throws up a report header, runs the calculation,
 # and resets the interation counter when done.
-sub calculate ( $ self, $formula ) {
+sub calculate ( $self, $formula ) {
     die "No formula provided!\n" unless $formula;
 
     $self->_log( " #  Token Number Stack          Operator Stack        Action    Remaining" );
