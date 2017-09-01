@@ -87,14 +87,14 @@ __END__
 
 =head1 NAME
 
-bin/trak.pl - Run the IssueTrak formula parser
+trak.pl - Run the IssueTrak formula parser
 
 =head1 SYNOPSIS
 
-    ./bin/trak.pl [--debug] [--help] [--formulahelp] [formula1] [formula2]
+    ./trak.pl [--debug] [--help] [--formulahelp] [formula1] [formula2]
 
     # If you like shorter arguments...
-    ./bin/trak.pl [-d] [-h] [-f] [formula1] [formula2]
+    ./trak.pl [-d] [-h] [-f] [formula1] [formula2]
 
 =head1 OPTIONS
 
