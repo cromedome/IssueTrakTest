@@ -1,5 +1,5 @@
 [1mNAME[0m
-    Trak::Calc - implement a calculator/forumla parser and evaluator in Perl.
+    Trak - implement a calculator/forumla parser and evaluator in Perl.
 
 [1mDESCRIPTION[0m
     This implements a modified Shunting Yard Algorithm

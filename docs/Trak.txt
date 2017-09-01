@@ -28,8 +28,8 @@
     directly. If no formulas were given, launch an interactive shell that lets
     the user enter a formula and execute it immediately.
 
-    The calculator is implemented by Trak::Calc. See the documentation there
-    for specifics on how it is implemented.
+    The calculator is implemented by Trak. See the documentation there for
+    specifics on how it is implemented.
 
 [1mUSING THE SHELL[0m
     When started with no formula arguments, trak.pl starts an interactive

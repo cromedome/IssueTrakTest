@@ -13,7 +13,7 @@ use Term::ReadLine;
 use Getopt::Long;
 use Pod::Usage;
 use Try::Tiny;
-use Trak::Calc;
+use Trak;
 
 # Parse CLI options
 GetOptions(
@@ -27,7 +27,7 @@ my @formulas = @ARGV;
 pod2usage(0) if $help;
 
 # Show help, calculate the formulas given, or drop into interactive mode
-my $calc = Trak::Calc->new( debug => $debug );
+my $calc = Trak->new( debug => $debug );
 if( $fh ) {
     say $calc->help;
 }
@@ -48,7 +48,7 @@ sub do_interactive( $calc ) {
     my $term = Term::ReadLine->new('Trak');
 
     say qq{
-Hi there! I'm a simple wrapper around Trak::Calc. My purpose in life
+Hi there! I'm a simple wrapper around Trak.pm. My purpose in life
 is to make it easy to enter one or more formulas to evaluate into
 the calculator and evaluate the result. If there's a problem with
 your formula, I will tell you that too. So let's get started!
@@ -126,7 +126,7 @@ This program tries to parse any formulas passed through the command line
 directly. If no formulas were given, launch an interactive shell that lets
 the user enter a formula and execute it immediately.
 
-The calculator is implemented by L<Trak::Calc>. See the documentation there
+The calculator is implemented by L<Trak>. See the documentation there
 for specifics on how it is implemented.
 
 =head1 USING THE SHELL

@@ -1,7 +1,6 @@
 t/001sanity.t ... 
 ok 1 - use Trak;
-ok 2 - use Trak::Calc;
-1..2
+1..1
 ok
 t/calc.t ........ 
 ok 1 - Calculator can evaluate simple formulas
@@ -39,14 +38,13 @@ ok 32 - Calculator produces formula help when asked
 1..32
 ok
 t/perlcritic.t .. 
-ok - Test::Perl::Critic for "t/perlcritic.t"
 ok - Test::Perl::Critic for "t/001sanity.t"
+ok - Test::Perl::Critic for "t/perlcritic.t"
 ok - Test::Perl::Critic for "bin/trak.pl"
-ok - Test::Perl::Critic for "lib/Trak.pm"
 ok - Test::Perl::Critic for "t/calc.t"
-ok - Test::Perl::Critic for "lib/Trak/Calc.pm"
-1..6
+ok - Test::Perl::Critic for "lib/Trak.pm"
+1..5
 ok
 All tests successful.
-Files=3, Tests=40,  1 wallclock secs ( 0.02 usr  0.00 sys +  1.36 cusr  0.12 csys =  1.50 CPU)
+Files=3, Tests=38,  1 wallclock secs ( 0.01 usr  0.00 sys +  1.22 cusr  0.14 csys =  1.37 CPU)
 Result: PASS

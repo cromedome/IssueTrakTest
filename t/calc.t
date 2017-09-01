@@ -5,10 +5,10 @@ use v5.24;
 use Test::Most;
 use Test::Warn;
 use Test::Output;
-use Trak::Calc;
+use Trak;
 
 # Create a calculator for the rest of our tests
-my $calc = Trak::Calc->new;
+my $calc = Trak->new;
 
 # Formula complexity
 cmp_ok( $calc->calculate( "1 + 2 + 3 + 4 - 5" ), '==', 5, 
