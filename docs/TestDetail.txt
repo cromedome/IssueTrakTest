@@ -50,5 +50,5 @@ ok - Test::Perl::Critic for "t/001sanity.t"
 1..4
 ok
 All tests successful.
-Files=3, Tests=42,  1 wallclock secs ( 0.02 usr  0.00 sys +  1.14 cusr  0.10 csys =  1.26 CPU)
+Files=3, Tests=42,  1 wallclock secs ( 0.02 usr  0.00 sys +  1.19 cusr  0.10 csys =  1.31 CPU)
 Result: PASS

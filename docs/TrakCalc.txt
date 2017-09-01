@@ -65,8 +65,9 @@
     Functions work rather similarly. In the %functions hash, a function name
     must be provided, along with a help description, and finally, a
     single-argument anonymous function that implements that function.
-    Currently, functions may only take 0 or 1 arguments. Contents of the
-    argument list are evaluated as parenthetical expressions.
+    Currently, functions may only take 0 or 1 arguments. Simple expressions
+    (i.e, no function calls) in argument lists are evaluated as parenthetical
+    expressions.
 
 [1mPUBLIC METHODS[0m
   [1mcalculate()[0m
