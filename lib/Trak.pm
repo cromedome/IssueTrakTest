@@ -55,7 +55,6 @@ my %ops = (
 
 # List of functions supported
 my %functions = (
-    # TODO: check for infinite tan
     sqrt => { 
         help => "Square Root: sqrt(x)", 
         exec => sub { 
@@ -66,6 +65,7 @@ my %functions = (
         }},
     sin  => { help => "Sine: sin(x)",         exec => sub { _check_args(1, @_); return sin shift;  }}, 
     cos  => { help => "Cosine: cos(x)",       exec => sub { _check_args(1, @_); return cos shift;  }}, 
+    # TODO: check for infinite tan
     tan  => { help => "Tangent: tan(x)",      exec => sub { _check_args(1, @_); return tan shift;  }}, 
     pi   => { help => "Pi: pi()",             exec => sub { _check_args(0, @_); return pi();       }},
 );
@@ -217,10 +217,11 @@ sub _pluck_token( $self, $formula ) {
         # to work around this with a simple search-and-replace, but in doing so, I
         # had to make a little redundant code in the operator and number blocks. :(
         $$formula =~ s/^\s+//;
-        $$formula =~ /^(\([-]?\d*?\s*?\))([^\)]*)$/;
+        $$formula =~ /^(\(.*?\))([^\)]*)$/;
         die "Parse error: ')' expected\n" unless $1;
         $$formula =~ s/$2//g;
         $arg = $1; $arg =~ s/\(|\s*?|\)//g;
+        $arg = $self->_evaluate($arg) if $arg;
     }
     elsif( $$formula =~ /^(\()(.*)$/ ) {
         # Handle parenthetical expressions.
