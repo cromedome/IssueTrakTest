@@ -47,6 +47,8 @@ lives_ok{ $calc->calculate( "sin(90)" )} "...and sine";
 lives_ok{ $calc->calculate( "cos(90)" )} "...and cosine";
 lives_ok{ $calc->calculate( "tan(90)" )} "...and tangent";
 lives_ok{ $calc->calculate( "pi()" )} "...and zero argument functions, like pi()";
+lives_ok{ $calc->calculate( "sqrt( 8 + 1 )" ) } 
+    "...and even evaluates simple expressions in argument lists";
  
 # Valid numbers
 lives_ok { $calc->calculate( "1 + 2" ) } "Calculator only works correctly with integers";
