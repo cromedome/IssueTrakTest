@@ -70,6 +70,10 @@ throws_ok { $calc->calculate( "foo(2)" ) }
     qr/Unknown function: 'foo'/,
     "Calculator won't try to evaluate functions it doesn't know about";
 
+#throws_ok { $calc->calculate( "sqrt()" ) } 
+    #qr/no function argument/,
+    #"...and will fail when an argument is expected but not provided.";
+
 # Garbage at end
 throws_ok { $calc->calculate( "(1 + 2) / (7 - 4) &^" ) } 
     qr/Unknown token/,
@@ -83,6 +87,10 @@ throws_ok { $calc->calculate( "3 * - 1" ) }
 throws_ok { $calc->calculate( "3 ^ " ) } 
     qr/Parse error: too many operators, not enough operands/,
     "...and will fail when given too few operands";
+
+# Bug related tests
+cmp_ok( $calc->calculate(" 0 + 1 "), '==', 1, 
+    'Bug where calculator failed when first operand was 0' );
 
 # Look at calculator output
 sub capture_calc_output {

@@ -95,7 +95,6 @@ sub _evaluate ( $self,  $formula ) {
     };
 
     while( length $formula ) {
-        #$formula =~ s/([\d\)])\(/$1*(/; # Treat any operand next to a paren as multiplication
         my( $token, $type, $arg ) = $self->_pluck_token( \$formula );
         
         # If it's a number, just dump it on the stack and continue.
@@ -134,6 +133,7 @@ sub _evaluate ( $self,  $formula ) {
             }
         }
         elsif( $type eq "FUNC" ) {
+            die "Parse error: no function argument provided!" unless $arg;
             my $result = $functions{ $token }{ exec }->( $arg );
             $trace->( "Evaluate", $token );
             push @numstack, $result;
@@ -148,8 +148,9 @@ sub _evaluate ( $self,  $formula ) {
     # All done. Empty the stacks and evaluate the result.
     my $value = pop @numstack;
     while( @opstack ) {
+        die "Parse error: too many operators, not enough operands!\n" unless @numstack > 0;
         my $op = pop @opstack;
-        my $t1 = pop @numstack or die "Parse error: too many operators, not enough operands!\n";
+        my $t1 = pop @numstack;
         my $result = $ops{ $op }{ exec }->( $t1, $value );
         $trace->( "Calculate", $result );
         ++$iteration; # Calculation takes time too!
