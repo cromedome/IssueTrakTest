@@ -55,10 +55,10 @@ my %ops = (
 
 # List of functions supported
 my %functions = (
-    sqrt => { help => "Square Root: sqrt( arg )", exec => sub { return sqrt shift; }},
-    sin  => { help => "Sine: sin(x)",             exec => sub { return sin shift;  }}, 
-    cos  => { help => "Cosine: cos(x)",           exec => sub { return cos shift;  }}, 
-    tan  => { help => "Tangent: tan(x)",          exec => sub { return tan shift;  }}, 
+    sqrt => { help => "Square Root: sqrt( x )", exec => sub { return sqrt shift; }},
+    sin  => { help => "Sine: sin(x)",           exec => sub { return sin shift;  }}, 
+    cos  => { help => "Cosine: cos(x)",         exec => sub { return cos shift;  }}, 
+    tan  => { help => "Tangent: tan(x)",        exec => sub { return tan shift;  }}, 
 );
 
 # Calculate is a front-end for evaluate. It throws up a report header, runs the calculation,
