@@ -55,11 +55,20 @@ my %ops = (
 
 # List of functions supported
 my %functions = (
-    sqrt => { help => "Square Root: sqrt(x)", exec => sub { return sqrt shift; }},
-    sin  => { help => "Sine: sin(x)",         exec => sub { return sin shift;  }}, 
-    cos  => { help => "Cosine: cos(x)",       exec => sub { return cos shift;  }}, 
-    tan  => { help => "Tangent: tan(x)",      exec => sub { return tan shift;  }}, 
+    # TODO: negative sqrt()
+    sqrt => { help => "Square Root: sqrt(x)", exec => sub { _check_args(1, @_); return sqrt shift; }},
+    sin  => { help => "Sine: sin(x)",         exec => sub { _check_args(1, @_); return sin shift;  }}, 
+    cos  => { help => "Cosine: cos(x)",       exec => sub { _check_args(1, @_); return cos shift;  }}, 
+    tan  => { help => "Tangent: tan(x)",      exec => sub { _check_args(1, @_); return tan shift;  }}, 
+    pi   => { help => "Pi: pi()",             exec => sub { _check_args(0, @_); return pi();       }},
 );
+
+# TODO: document
+# TODO: document multi arg functions?
+sub _check_args( $count, @arglist ) {
+    die "Parse error: got " . scalar @arglist . " arguments, expected $count!\n"
+        if $count != scalar @arglist;
+}
 
 # Calculate is a front-end for evaluate. It throws up a report header, runs the calculation,
 # and resets the interation counter when done.
@@ -75,8 +84,8 @@ sub calculate ( $self, $formula ) {
 }
 
 # Evaluate the function given and return the result.
-sub _evaluate ( $self,  $formula ) {
-    die "No formula provided!\n" unless $formula;
+sub _evaluate ( $self, $formula ) {
+    die "No formula provided!\n" unless $formula ne '';
     $formula =~ s/^\s+//; # Remove leading whitespace
 
     my( @opstack, @numstack );
@@ -133,8 +142,8 @@ sub _evaluate ( $self,  $formula ) {
             }
         }
         elsif( $type eq "FUNC" ) {
-            die "Parse error: no function argument provided!" unless $arg;
-            my $result = $functions{ $token }{ exec }->( $arg );
+            my $exec   = $functions{ $token }{ exec };
+            my $result = ( $arg eq '' ? $exec->() : $exec->( $arg ));
             $trace->( "Evaluate", $token );
             push @numstack, $result;
         }
@@ -190,7 +199,7 @@ sub _pluck_token( $self, $formula ) {
         $$formula = $2;
     }
     # Function
-    elsif( $$formula =~ /^([a-z]\w+)\s*?\((.*)$/ ) {  
+    elsif( $$formula =~ /^([a-z]\w+)\s*?(\(.*)$/ ) {  
         $token    = $1;
         $type     = "FUNC";
         $$formula = $2;
@@ -203,10 +212,10 @@ sub _pluck_token( $self, $formula ) {
         # to work around this with a simple search-and-replace, but in doing so, I
         # had to make a little redundant code in the operator and number blocks. :(
         $$formula =~ s/^\s+//;
-        $$formula =~ /^([-]?\d+)\s*?\)([^\)]*)$/;
+        $$formula =~ /^(\([-]?\d*?\s*?\))([^\)]*)$/;
         die "Parse error: ')' expected\n" unless $1;
-        $arg = $1;
         $$formula =~ s/$2//g;
+        $arg = $1; $arg =~ s/\(|\s*?|\)//g;
     }
     elsif( $$formula =~ /^(\()(.*)$/ ) {
         # Handle parenthetical expressions.
@@ -216,7 +225,7 @@ sub _pluck_token( $self, $formula ) {
         die "Parse error: ')' expected\n" unless $2;
         $$formula = $2;
         $$formula =~ /^(.*?)\)(.*)$/;
-        die "Parse error: ')' expected\n" unless $1;
+        die "Parse error: ')' expected\n" unless $1 ne '';
 
         # Pass only the parenthetical piece. Make sure we remove it from the original formula.
         my $f2 = $1; $f2 =~ s/^\s+//; $f2 =~ s/\s+$//;
@@ -231,7 +240,6 @@ sub _pluck_token( $self, $formula ) {
     }
 
     $$formula =~ s/^\s+//; # Remove whitespace
-    $arg //= ""; # Make sure arg is at least empty string
     return( $token, $type, $arg );
 }
 

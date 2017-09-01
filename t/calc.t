@@ -43,6 +43,7 @@ cmp_ok( $calc->calculate( "sqrt(9)" ), '==', 3, "Calculator calculates square ro
 lives_ok{ $calc->calculate( "sin(90)" )} "...and sine";
 lives_ok{ $calc->calculate( "cos(90)" )} "...and cosine";
 lives_ok{ $calc->calculate( "tan(90)" )} "...and tangent";
+lives_ok{ $calc->calculate( "pi()" )} "...and zero argument functions, like pi()";
  
 # Valid numbers
 lives_ok { $calc->calculate( "1 + 2" ) } "Calculator only works correctly with integers";
@@ -70,9 +71,9 @@ throws_ok { $calc->calculate( "foo(2)" ) }
     qr/Unknown function: 'foo'/,
     "Calculator won't try to evaluate functions it doesn't know about";
 
-#throws_ok { $calc->calculate( "sqrt()" ) } 
-    #qr/no function argument/,
-    #"...and will fail when an argument is expected but not provided.";
+throws_ok { $calc->calculate( "sqrt()" ) } 
+    qr/Parse error: got \d arguments, expected \d/,
+    "...and will fail when an argument is expected but not provided";
 
 # Garbage at end
 throws_ok { $calc->calculate( "(1 + 2) / (7 - 4) &^" ) } 
