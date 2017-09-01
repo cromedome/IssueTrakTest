@@ -33,7 +33,8 @@ c:\projectdir> modules.bat
 
 If you are on Linux or MacOS, run this instead:
 ```
-~/projectdir> cpanm --installdeps . --with-develop --with-all-features
+~/projectdir> sudo cpan install App::cpanminus
+~/projectdir> sudo cpanm --installdeps . --with-develop --with-all-features
 ```
 
 ## Running the Application
